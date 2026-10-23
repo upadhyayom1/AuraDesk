@@ -39,6 +39,18 @@ Welcome to the engineering documentation for **AuraDesk**. This repository conta
 
 ---
 
+## 👥 Team Assignments & Work Breakdown
+
+Detailed, step-by-step implementation guides and task checklists for each team member:
+
+| Member | Assigned Domains | Detailed Task Guide |
+| :--- | :--- | :--- |
+| **`@adya`** | **Application & Settings**, **Rotation & History** | 📖 [**Adya's Implementation Guide**](./tasks/adya-application-settings-rotation.md) |
+| **`@Naman`** | **Context-Aware Personalization**, **Discovery** | 📖 [**Naman's Implementation Guide**](./tasks/naman-personalization-discovery.md) |
+| **`@om`** | **Collections & Desktop Integration** | 📖 [**Om's Implementation Guide**](./tasks/om-collections-desktop-integration.md) |
+
+---
+
 ## 🚀 Key Architectural Principles
 
 - **No REST Server**: AuraDesk is an Electron desktop app. Communication between the React UI (renderer) and Node.js (main process) happens strictly via **validated IPC channels** exposed via `contextBridge` (`window.api`).
