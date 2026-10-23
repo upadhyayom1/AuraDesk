@@ -1,0 +1,50 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node modules
+node_modules
+dist
+dist-electron
+out
+release
+build/*.exe
+build/*.dmg
+build/*.AppImage
+
+# Local SQLite databases & temp files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+temp/
+auradesk_temp/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Keep gitkeep files
+!.gitkeep
