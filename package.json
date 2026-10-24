@@ -7,11 +7,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "concurrently \"npm run dev:frontend\" \"wait-on tcp:5173 && npm run dev:electron\"",
-    "dev:frontend": "npm.cmd --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
     "dev:electron": "electron .",
-    "build:frontend": "npm.cmd --prefix frontend run build",
+    "build:frontend": "npm --prefix frontend run build",
     "build": "npm run build:frontend && electron-builder",
-    "install:all": "npm.cmd install && npm.cmd --prefix frontend install",
+    "install:all": "npm install && npm --prefix frontend install",
     "rebuild": "electron-builder install-app-deps"
   },
   "dependencies": {
