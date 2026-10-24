@@ -28,6 +28,8 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
     createCollection,
     deleteCollection,
     toggleWallpaperInCollection,
+    applyCollection,
+    exportCollection,
     glassTheme,
   } = useWallpaper();
 
@@ -154,17 +156,38 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
       {/* Selected Collection Detailed View */}
       {selectedCol && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between px-1">
-            <h3 className="text-sm font-semibold text-white tracking-wide">
+          <div className="flex items-center justify-between px-1 flex-wrap gap-2">
+            <h3 className={`text-sm font-semibold tracking-wide ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
               Wallpapers in "{selectedCol.name}" ({collectionWallpapers.length})
             </h3>
-            <button
-              onClick={onOpenAddCustom}
-              className="text-xs text-cyan-300 hover:text-cyan-200 transition-colors flex items-center gap-1"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Add Custom Image</span>
-            </button>
+            <div className="flex items-center gap-2">
+              {collectionWallpapers.length > 0 && (
+                <>
+                  <button
+                    onClick={() => applyCollection(selectedCol.id, 'next')}
+                    className="px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/30 text-xs font-medium transition-all flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer"
+                    title="Apply next wallpaper from this collection directly to your desktop"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>Apply to Desktop</span>
+                  </button>
+                  <button
+                    onClick={() => exportCollection(selectedCol.id)}
+                    className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 text-xs font-medium transition-all shadow-xs active:scale-95 cursor-pointer"
+                    title="Export collection vault to JSON file"
+                  >
+                    Export Vault
+                  </button>
+                </>
+              )}
+              <button
+                onClick={onOpenAddCustom}
+                className="text-xs text-cyan-300 hover:text-cyan-200 transition-colors flex items-center gap-1 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Add Custom Image</span>
+              </button>
+            </div>
           </div>
 
           {collectionWallpapers.length === 0 ? (

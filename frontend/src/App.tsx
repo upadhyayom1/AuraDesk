@@ -6,10 +6,7 @@ import { MacTrayMenu } from './components/MacTrayMenu';
 import { DesktopSimulator } from './components/DesktopSimulator';
 import { WallpaperDiscovery } from './components/WallpaperDiscovery';
 import { CollectionsView } from './components/CollectionsView';
-import { ContextRulesView } from './components/ContextRulesView';
-import { CalendarSchedulerView } from './components/CalendarSchedulerView';
 import { HistoryTrayView } from './components/HistoryTrayView';
-import { GlassDesignShowcase } from './components/GlassDesignShowcase';
 import { SettingsModal } from './components/SettingsModal';
 import { TeamInfoModal } from './components/TeamInfoModal';
 import { AddCustomWallpaperModal } from './components/AddCustomWallpaperModal';
@@ -89,10 +86,7 @@ const AuraDeskApp: React.FC = () => {
               {activeTab === 'discovery' && 'Explore 5K & 4K Wallpapers'}
               {activeTab === 'desktop' && 'Live Desktop Simulation & Display Engine'}
               {activeTab === 'collections' && 'Collection Manager & Playlists'}
-              {activeTab === 'context-rules' && 'Personalization & Context Rules'}
-              {activeTab === 'calendar' && 'Calendar Event Automation'}
               {activeTab === 'history' && 'Rotation History & Instant Rollback'}
-              {activeTab === 'glass-design' && 'MacBook Frosted Glass UI Design System'}
             </span>
           </div>
 
@@ -170,10 +164,7 @@ const AuraDeskApp: React.FC = () => {
           {activeTab === 'collections' && (
             <CollectionsView onOpenAddCustom={() => setIsAddCustomOpen(true)} />
           )}
-          {activeTab === 'context-rules' && <ContextRulesView />}
-          {activeTab === 'calendar' && <CalendarSchedulerView />}
           {activeTab === 'history' && <HistoryTrayView />}
-          {activeTab === 'glass-design' && <GlassDesignShowcase />}
         </div>
       </div>
 

@@ -22,10 +22,7 @@ export type ActiveTab =
   | 'discovery'
   | 'desktop'
   | 'collections'
-  | 'context-rules'
-  | 'calendar'
-  | 'history'
-  | 'glass-design';
+  | 'history';
 
 interface MacSidebarProps {
   activeTab: ActiveTab;
@@ -60,10 +57,7 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
     { id: 'discovery' as ActiveTab, label: 'Explore Wallpapers', icon: Compass, count: wallpapers.length },
     { id: 'desktop' as ActiveTab, label: 'Desktop Simulator', icon: Monitor },
     { id: 'collections' as ActiveTab, label: 'Collections', icon: FolderHeart, count: collections.length },
-    { id: 'context-rules' as ActiveTab, label: 'Context Rules', icon: CloudSun },
-    { id: 'calendar' as ActiveTab, label: 'Calendar Sync', icon: Calendar },
     { id: 'history' as ActiveTab, label: 'Rotation History', icon: History },
-    { id: 'glass-design' as ActiveTab, label: 'Glass UI Design System', icon: Palette, highlight: true },
   ];
 
   return (
