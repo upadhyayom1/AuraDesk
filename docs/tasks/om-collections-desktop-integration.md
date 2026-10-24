@@ -250,14 +250,15 @@ Implement these two optional channels:
 
 ## 9. Step-by-Step Task Checklist for Om
 
-- [ ] **Step 1: DB Migration**: Create tables `wallpapers`, `collections`, and `collection_items` with cascading foreign keys and indexes.
-- [ ] **Step 2: Wallpaper Repository**: Implement CRUD queries for `wallpapers` (insert/upsert metadata cache, fetch by ID).
-- [ ] **Step 3: Collections Repository**: Implement collection CRUD and transactional reorder queries.
-- [ ] **Step 4: Sharp Scaling Engine**: Implement `scaleAndCrop()` matching the display's physical resolution (`scaleFactor`).
-- [ ] **Step 5: WallpaperManager**: Implement `apply()` with dynamic `import('wallpaper')`, preview caching, and history recording.
-- [ ] **Step 6: Local File Picker**: Implement `wallpaper:pickLocal` using Electron `dialog.showOpenDialog` and dimension inspection.
-- [ ] **Step 7: IPC Handlers**: Register all `wallpaper:*` and `collection:*` channels with Zod schema validation.
-- [ ] **Step 8: Verification**:
+- [x] **Step 1: DB Migration**: Create tables `wallpapers`, `collections`, and `collection_items` with cascading foreign keys and indexes.
+- [x] **Step 2: Wallpaper Repository**: Implement CRUD queries for `wallpapers` (insert/upsert metadata cache, fetch by ID).
+- [x] **Step 3: Collections Repository**: Implement collection CRUD and transactional reorder queries.
+- [x] **Step 4: Sharp Scaling Engine**: Implement `scaleAndCrop()` matching the display's physical resolution (`scaleFactor`).
+- [x] **Step 5: WallpaperManager**: Implement `apply()` with dynamic `import('wallpaper')`, preview caching, and history recording.
+- [x] **Step 6: Local File Picker**: Implement `wallpaper:pickLocal` using Electron `dialog.showOpenDialog` and dimension inspection.
+- [x] **Step 7: IPC Handlers**: Register all `wallpaper:*` and `collection:*` channels with Zod schema validation.
+- [x] **Step 8: Verification**:
   - Test applying an online image: verify desktop wallpaper changes with correct aspect ratio on your primary display.
   - Test applying a local image from your disk.
   - Test reordering items in a collection and verify positions update in SQLite.
+  - Test bonus collection JSON export/import with Zod schema validation.
