@@ -46,3 +46,21 @@ export const WeatherSetLocationSchema = z.union([
   z.object({ city: z.string().min(1) }),
   z.object({ lat: z.number(), lon: z.number() })
 ]);
+
+export const AppSettingsSchema = z.object({
+  rotationInterval: z.number().int().min(1).default(30),
+  shuffleEnabled: z.boolean().default(false),
+  autoAdaptEnabled: z.boolean().default(true),
+  location: z.object({
+    lat: z.number().optional(),
+    lon: z.number().optional(),
+    city: z.string().optional()
+  }).default({}),
+  launchOnStartup: z.boolean().default(false),
+  sourcesEnabled: z.object({
+    unsplash: z.boolean().default(true),
+    pexels: z.boolean().default(true)
+  }).default({ unsplash: true, pexels: true })
+});
+
+export const AppSettingsPatchSchema = AppSettingsSchema.partial();

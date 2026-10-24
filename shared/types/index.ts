@@ -103,3 +103,19 @@ export interface IPCResponse<T = any> {
     message: string;
   };
 }
+
+export interface AppSettingsData {
+  rotationInterval: number;
+  shuffleEnabled: boolean;
+  autoAdaptEnabled: boolean;
+  location: {
+    lat?: number;
+    lon?: number;
+    city?: string;
+  };
+  launchOnStartup: boolean;
+  sourcesEnabled: {
+    unsplash: boolean;
+    pexels: boolean;
+  };
+}
