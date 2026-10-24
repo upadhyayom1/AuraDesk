@@ -14,10 +14,13 @@ const { runMigrations } = require('../../database/migrations/index');
 const SettingsRepository = require('../../database/repositories/settingsRepo');
 const WallpaperRepository = require('../../database/repositories/wallpaperRepo');
 const CollectionsRepository = require('../../database/repositories/collectionsRepo');
+const RotationConfigRepository = require('../../database/repositories/rotationConfigRepo');
+const RotationHistoryRepository = require('../../database/repositories/rotationHistoryRepo');
 
 const AppSettings = require('../settings/AppSettings');
 const WallpaperManager = require('../wallpaper/WallpaperManager');
 const CollectionsService = require('../collections/CollectionsService');
+const RotationScheduler = require('../scheduler/RotationScheduler');
 
 const SystemTrayController = require('../../tray/SystemTrayController');
 
@@ -25,6 +28,7 @@ const { registerWallpaperHandlers } = require('../../ipc/handlers/wallpaperHandl
 const { registerCollectionsHandlers } = require('../../ipc/handlers/collectionsHandler');
 const { registerSettingsHandlers } = require('../../ipc/handlers/settingsHandler');
 const { registerAppHandlers } = require('../../ipc/handlers/appHandler');
+const { registerRotationHandlers } = require('../../ipc/handlers/rotationHandler');
 
 class WallpaperApplication {
   constructor() {
@@ -32,11 +36,13 @@ class WallpaperApplication {
     this.settingsRepo = null;
     this.wallpaperRepo = null;
     this.collectionsRepo = null;
+    this.rotationConfigRepo = null;
+    this.rotationHistoryRepo = null;
 
     this.settings = null;
     this.wallpaperManager = null;
     this.collectionsService = null;
-    this.scheduler = null; // Will be attached in Rotation milestone
+    this.scheduler = null;
 
     this.mainWindow = null;
     this.trayController = null;
@@ -59,6 +65,8 @@ class WallpaperApplication {
       this.settingsRepo = new SettingsRepository(this.db);
       this.wallpaperRepo = new WallpaperRepository(this.db);
       this.collectionsRepo = new CollectionsRepository(this.db, this.wallpaperRepo);
+      this.rotationConfigRepo = new RotationConfigRepository(this.db);
+      this.rotationHistoryRepo = new RotationHistoryRepository(this.db, this.wallpaperRepo);
 
       // 3. Initialize Settings service and load persistent cache
       this.settings = new AppSettings(this.settingsRepo);
@@ -75,16 +83,27 @@ class WallpaperApplication {
         this.wallpaperManager
       );
 
-      // 5. Register all IPC channel handlers
+      // 5. Initialize RotationScheduler Engine
+      this.scheduler = new RotationScheduler({
+        rotationConfigRepo: this.rotationConfigRepo,
+        rotationHistoryRepo: this.rotationHistoryRepo,
+        collectionsRepo: this.collectionsRepo,
+        wallpaperManager: this.wallpaperManager,
+        getMainWindow: () => this.mainWindow
+      });
+      await this.scheduler.init();
+
+      // 6. Register all IPC channel handlers
       registerWallpaperHandlers(this.wallpaperManager, () => this.mainWindow);
       registerCollectionsHandlers(this.collectionsService, () => this.mainWindow);
       registerSettingsHandlers(this.settings);
       registerAppHandlers(this.settings, () => this.mainWindow, () => this.shutdown());
+      registerRotationHandlers(this.scheduler, this.rotationHistoryRepo);
 
-      // 6. Create Main Window
+      // 7. Create Main Window
       this.createMainWindow();
 
-      // 7. Initialize System Tray Controller with keep-alive
+      // 8. Initialize System Tray Controller with keep-alive
       this.trayController = new SystemTrayController({
         getMainWindow: () => this.mainWindow,
         scheduler: this.scheduler,
@@ -94,7 +113,7 @@ class WallpaperApplication {
       this.trayController.init();
 
       this.isRunning = true;
-      console.log('[WallpaperApplication] Successfully started AuraDesk main application.');
+      console.log('[WallpaperApplication] Successfully started AuraDesk main application with active scheduler.');
     } catch (err) {
       console.error('[WallpaperApplication] Fatal error during application bootstrap:', err);
       throw err;
