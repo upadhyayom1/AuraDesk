@@ -271,7 +271,7 @@ Implement a `setMockContext({ weather?: string, activeEvent?: CalendarEvent })` 
 ## 9. Step-by-Step Task Checklist for Naman
 
 - [x] **Step 1: DB Migration**: Create tables `personalization_rules`, `calendar_bindings`, `calendar_events_cache`, `context_cache`, and `overrides`.
-- [ ] **Step 2: Unsplash & Pexels Adapters**: Implement Axios clients with retry logic (`axios-retry`, max 2 retries, timeout 8s).
+- [x] **Step 2: Unsplash & Pexels Adapters**: Implement Axios clients with retry logic (`axios-retry`, max 2 retries, timeout 8s).
 - [ ] **Step 3: Discovery Service**: Implement multi-source aggregation, normalization, and Pexels fallback.
 - [ ] **Step 4: Weather Service**: Implement OpenWeatherMap API integration with strict 10-minute cache and `isDay` calculation.
 - [ ] **Step 5: Calendar OAuth**: Implement desktop loopback redirect with PKCE and `safeStorage` encryption for tokens.
