@@ -13,9 +13,19 @@ import { GlassDesignShowcase } from './components/GlassDesignShowcase';
 import { SettingsModal } from './components/SettingsModal';
 import { TeamInfoModal } from './components/TeamInfoModal';
 import { AddCustomWallpaperModal } from './components/AddCustomWallpaperModal';
+import { Sun, Moon, Minus, X } from 'lucide-react';
 
 const AuraDeskApp: React.FC = () => {
-  const { currentWallpaper, isTrayOpen, setIsTrayOpen, glassTheme } = useWallpaper();
+  const {
+    currentWallpaper,
+    isTrayOpen,
+    setIsTrayOpen,
+    glassTheme,
+    setGlassTheme,
+    minimizeAppToTray,
+    quitApplication,
+    isNativeElectron,
+  } = useWallpaper();
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('discovery');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -86,12 +96,65 @@ const AuraDeskApp: React.FC = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-3 app-no-drag">
+          <div className="flex items-center gap-2.5 app-no-drag">
+            {/* Quick Switch to Light / Dark Mode Button */}
+            <button
+              type="button"
+              onClick={() => setGlassTheme(isWhitish ? 'blackish' : 'whitish')}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium transition-all shadow-xs cursor-pointer ${
+                isWhitish
+                  ? 'bg-white/90 hover:bg-white text-slate-800 border-slate-300/80 hover:border-slate-400 shadow-slate-200/50'
+                  : 'bg-white/10 hover:bg-white/15 text-slate-200 border-white/20 hover:border-white/30'
+              }`}
+              title={isWhitish ? 'Switch to Dark Mode (Obsidian Glass)' : 'Switch to Light Mode (Frosted Glass)'}
+              aria-label={isWhitish ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            >
+              {isWhitish ? (
+                <>
+                  <Moon className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>Dark Mode</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="w-3.5 h-3.5 text-amber-400 fill-amber-400/20" />
+                  <span>Light Mode</span>
+                </>
+              )}
+            </button>
+
             <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full border ${
               isWhitish ? 'border-slate-300 text-slate-600 bg-white/60' : 'border-white/15 text-slate-400 bg-white/5'
             }`}>
               AuraDesk · Softablitz 2026 Team 220
             </span>
+
+            {/* Electron Window Actions if running as native desktop app */}
+            {isNativeElectron && (
+              <div className={`flex items-center gap-1 pl-2 border-l ${isWhitish ? 'border-slate-300' : 'border-white/15'}`}>
+                <button
+                  type="button"
+                  onClick={minimizeAppToTray}
+                  className={`p-1.5 rounded-md transition-colors ${
+                    isWhitish ? 'hover:bg-black/5 text-slate-600' : 'hover:bg-white/10 text-slate-400'
+                  }`}
+                  title="Minimize to Tray"
+                  aria-label="Minimize"
+                >
+                  <Minus className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={quitApplication}
+                  className={`p-1.5 rounded-md transition-colors ${
+                    isWhitish ? 'hover:bg-rose-500/10 hover:text-rose-600 text-slate-600' : 'hover:bg-rose-500/20 hover:text-rose-400 text-slate-400'
+                  }`}
+                  title="Quit AuraDesk"
+                  aria-label="Quit"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
           </div>
         </header>
 

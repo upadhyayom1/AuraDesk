@@ -134,8 +134,8 @@ class WallpaperApplication {
       minHeight: 700,
       backgroundColor: '#090d16',
       title: 'AuraDesk',
-      titleBarStyle: 'hiddenInset',
-      trafficLightPosition: { x: 18, y: 14 },
+      titleBarStyle: 'hidden',
+      trafficLightPosition: { x: -100, y: -100 },
       vibrancy: 'under-window',
       visualEffectState: 'active',
       webPreferences: {
@@ -145,6 +145,14 @@ class WallpaperApplication {
         sandbox: true
       }
     });
+
+    if (process.platform === 'darwin') {
+      try {
+        this.mainWindow.setWindowButtonVisibility?.(false);
+      } catch {
+        // Ignore if unsupported in current platform build
+      }
+    }
 
     const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
     if (isDev) {

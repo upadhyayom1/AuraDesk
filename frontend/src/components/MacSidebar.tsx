@@ -14,6 +14,8 @@ import {
   Check,
   ChevronRight,
   ShieldCheck,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export type ActiveTab =
@@ -47,6 +49,7 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
     wallpapers,
     currentWallpaper,
     glassTheme,
+    setGlassTheme,
     minimizeAppToTray,
     isNativeElectron,
   } = useWallpaper();
@@ -73,48 +76,54 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
     >
       {/* Top Window Controls & Branding */}
       <div className="space-y-4">
-        {/* macOS Traffic Lights Header */}
+        {/* macOS Top Header with Light/Dark Mode Switcher */}
         <div className="h-9 flex items-center justify-between pb-1 app-drag">
-          {/* If browser fallback, render simulated buttons; if Electron, native traffic lights are rendered by OS */}
-          {!isNativeElectron ? (
-            <div className="flex items-center gap-2 group app-no-drag">
-              <button
-                onClick={onOpenTeam}
-                className="w-3 h-3 rounded-full bg-rose-500/90 hover:bg-rose-600 border border-rose-600/50 flex items-center justify-center transition-transform active:scale-90"
-                title="Close (Team 220)"
-                aria-label="Close"
-              >
-                <span className="opacity-0 group-hover:opacity-100 text-[8px] font-bold text-rose-950">×</span>
-              </button>
-              <button
-                onClick={onOpenSettings}
-                className="w-3 h-3 rounded-full bg-amber-500/90 hover:bg-amber-600 border border-amber-600/50 flex items-center justify-center transition-transform active:scale-90"
-                title="Preferences"
-                aria-label="Minimize"
-              >
-                <span className="opacity-0 group-hover:opacity-100 text-[8px] font-bold text-amber-950">−</span>
-              </button>
-              <button
-                onClick={() => onSelectTab('desktop')}
-                className="w-3 h-3 rounded-full bg-emerald-500/90 hover:bg-emerald-600 border border-emerald-600/50 flex items-center justify-center transition-transform active:scale-90"
-                title="Expand Desktop Canvas"
-                aria-label="Zoom"
-              >
-                <span className="opacity-0 group-hover:opacity-100 text-[7px] font-bold text-emerald-950">+</span>
-              </button>
-            </div>
-          ) : (
-            /* Spacer preserving area for native macOS traffic lights (x: 18, y: 14) */
-            <div className="w-16 h-4 pointer-events-none" />
-          )}
+          {/* Light / Dark Mode Toggle Switch (Replaces the 3 corner dots) */}
+          <div
+            className={`flex items-center p-0.5 rounded-full border transition-all app-no-drag shadow-xs backdrop-blur-md ${
+              isWhitish
+                ? 'bg-black/5 border-black/10'
+                : 'bg-white/10 border-white/15'
+            }`}
+          >
+            <button
+              type="button"
+              onClick={() => setGlassTheme('whitish')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
+                isWhitish
+                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Switch to Light Glass Mode"
+              aria-label="Light Mode"
+            >
+              <Sun className={`w-3 h-3 ${isWhitish ? 'text-amber-500 fill-amber-500/20' : 'text-slate-400'}`} />
+              <span>Light</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setGlassTheme('blackish')}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
+                !isWhitish
+                  ? 'bg-neutral-800 text-white shadow-xs font-semibold border border-white/20'
+                  : 'text-slate-500 hover:text-slate-900'
+              }`}
+              title="Switch to Dark Glass Mode"
+              aria-label="Dark Mode"
+            >
+              <Moon className={`w-3 h-3 ${!isWhitish ? 'text-cyan-400 fill-cyan-400/20' : 'text-slate-500'}`} />
+              <span>Dark</span>
+            </button>
+          </div>
 
           <button
             onClick={onOpenTeam}
-            className={`app-no-drag flex items-center gap-1.5 px-2 py-0.5 rounded-md border text-[10px] font-mono transition-colors ${
+            className={`app-no-drag flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-mono transition-colors ${
               isWhitish
                 ? 'bg-black/5 hover:bg-black/10 border-black/10 text-slate-700'
                 : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
             }`}
+            title="Softablitz 2026 Team 220"
           >
             <span>Team 220</span>
           </button>
