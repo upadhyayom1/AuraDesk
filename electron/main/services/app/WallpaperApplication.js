@@ -29,6 +29,7 @@ const RotationScheduler = require('../scheduler/RotationScheduler');
 const { WallpaperDiscoveryService } = require('../discovery/index');
 const { WeatherService } = require('../weather/index');
 const { CalendarService } = require('../calendar/index');
+const { PersonalizationEngine } = require('../personalization/index');
 
 const SystemTrayController = require('../../tray/SystemTrayController');
 
@@ -56,6 +57,7 @@ class WallpaperApplication {
     this.discoveryService = null;
     this.weatherService = null;
     this.calendarService = null;
+    this.personalizationEngine = null;
     this.wallpaperManager = null;
     this.collectionsService = null;
     this.scheduler = null;
@@ -120,14 +122,28 @@ class WallpaperApplication {
         this.wallpaperManager
       );
 
-      // 5. Initialize RotationScheduler Engine
+      // 6. Initialize PersonalizationEngine (Eye of Agamotto)
+      this.personalizationEngine = new PersonalizationEngine({
+        appSettings: this.settings,
+        wallpaperRepo: this.wallpaperRepo,
+        overridesRepo: this.overridesRepo,
+        rulesRepo: this.rulesRepo,
+        calendarService: this.calendarService,
+        weatherService: this.weatherService,
+        collectionsService: this.collectionsService,
+        rotationScheduler: null
+      });
+
+      // 7. Initialize RotationScheduler Engine
       this.scheduler = new RotationScheduler({
         rotationConfigRepo: this.rotationConfigRepo,
         rotationHistoryRepo: this.rotationHistoryRepo,
         collectionsRepo: this.collectionsRepo,
         wallpaperManager: this.wallpaperManager,
+        personalizationEngine: this.personalizationEngine,
         getMainWindow: () => this.mainWindow
       });
+      this.personalizationEngine.rotationScheduler = this.scheduler;
       await this.scheduler.init();
 
       // 6. Register all IPC channel handlers

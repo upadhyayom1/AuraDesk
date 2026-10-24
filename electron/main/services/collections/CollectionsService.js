@@ -154,6 +154,17 @@ class CollectionsService {
   }
 
   /**
+   * Selects an item from a collection without immediately applying it to the OS desktop
+   * @param {string} collectionId
+   * @param {'random'|'next'} [mode='next']
+   * @returns {Object|null}
+   */
+  pickItem(collectionId, mode = 'next') {
+    const currentId = this.wallpaperManager?.currentWallpaper?.id || null;
+    return this.collectionsRepo.pickItem(collectionId, mode, currentId);
+  }
+
+  /**
    * Applies one item from the collection immediately (shuffle / cycle button)
    * @param {string} collectionId
    * @param {'random'|'next'} [mode='next']

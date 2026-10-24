@@ -222,6 +222,17 @@ class RotationScheduler {
   }
 
   /**
+   * Picks the next candidate wallpaper from active rotation collections without applying it
+   * @returns {Object|null}
+   */
+  pickNext() {
+    const pool = this._getActiveWallpapers();
+    if (!pool || pool.length === 0) return null;
+    const picked = this._pickNextWallpaper(pool);
+    return picked ? picked.wallpaper : null;
+  }
+
+  /**
    * Triggers an immediate wallpaper rotation step.
    * Protected with the isRotating re-entrancy lock.
    * @param {'MANUAL'|'ROTATION'|'RULE'|'CALENDAR'} [trigger='ROTATION']
