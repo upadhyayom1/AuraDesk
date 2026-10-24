@@ -11,6 +11,16 @@
   }
 }
 
+/* macOS Window Drag Regions */
+.app-drag {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
+
 /* 1. Whitish Transparent macOS Glassmorphism (Reference Image 1: macOS Finder Frost) */
 .mac-glass-whitish {
   background: rgba(255, 255, 255, 0.62);

@@ -128,12 +128,16 @@ class WallpaperApplication {
     const { width, height } = primaryDisplay.workAreaSize;
 
     this.mainWindow = new BrowserWindow({
-      width: Math.min(1280, width),
-      height: Math.min(840, height),
+      width: Math.min(1380, width),
+      height: Math.min(880, height),
       minWidth: 1024,
       minHeight: 700,
       backgroundColor: '#090d16',
       title: 'AuraDesk',
+      titleBarStyle: 'hiddenInset',
+      trafficLightPosition: { x: 18, y: 14 },
+      vibrancy: 'under-window',
+      visualEffectState: 'active',
       webPreferences: {
         preload: path.join(__dirname, '../../preload/index.js'),
         contextIsolation: true,
