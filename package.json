@@ -11,8 +11,36 @@
     "dev:electron": "electron .",
     "build:frontend": "npm --prefix frontend run build",
     "build": "npm run build:frontend && electron-builder",
+    "build:dir": "npm run build:frontend && electron-builder --dir",
+    "build:dmg": "npm run build:frontend && electron-builder --mac dmg",
     "install:all": "npm install && npm --prefix frontend install",
     "rebuild": "electron-builder install-app-deps"
+  },
+  "build": {
+    "appId": "com.auradesk.app",
+    "productName": "AuraDesk",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "frontend/dist/**/*",
+      "shared/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/better-sqlite3/**/*",
+      "**/node_modules/sharp/**/*",
+      "**/node_modules/@img/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.lifestyle",
+      "target": [
+        "dir"
+      ],
+      "icon": "build/icon.png"
+    }
   },
   "dependencies": {
     "axios": "^1.7.9",

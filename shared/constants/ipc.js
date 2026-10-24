@@ -77,3 +77,10 @@ export const IPC_EVENTS = {
   NETWORK_STATUS: 'network:status',
   APP_ERROR: 'app:error'
 };
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    IPC_CHANNELS,
+    IPC_EVENTS
+  };
+}
