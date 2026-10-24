@@ -27,6 +27,7 @@ const WallpaperManager = require('../wallpaper/WallpaperManager');
 const CollectionsService = require('../collections/CollectionsService');
 const RotationScheduler = require('../scheduler/RotationScheduler');
 const { WallpaperDiscoveryService } = require('../discovery/index');
+const { WeatherService } = require('../weather/index');
 
 const SystemTrayController = require('../../tray/SystemTrayController');
 
@@ -52,6 +53,7 @@ class WallpaperApplication {
 
     this.settings = null;
     this.discoveryService = null;
+    this.weatherService = null;
     this.wallpaperManager = null;
     this.collectionsService = null;
     this.scheduler = null;
@@ -89,9 +91,14 @@ class WallpaperApplication {
       this.settings = new AppSettings(this.settingsRepo);
       await this.settings.load();
 
-      // 4. Initialize Wallpaper Discovery Service
+      // 4. Initialize Wallpaper Discovery Service & Weather Service
       this.discoveryService = new WallpaperDiscoveryService({
         appSettings: this.settings
+      });
+
+      this.weatherService = new WeatherService({
+        appSettings: this.settings,
+        contextCacheRepo: this.contextCacheRepo
       });
 
       // 5. Initialize Wallpaper & Collections services
