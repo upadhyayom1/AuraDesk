@@ -28,6 +28,7 @@ const CollectionsService = require('../collections/CollectionsService');
 const RotationScheduler = require('../scheduler/RotationScheduler');
 const { WallpaperDiscoveryService } = require('../discovery/index');
 const { WeatherService } = require('../weather/index');
+const { CalendarService } = require('../calendar/index');
 
 const SystemTrayController = require('../../tray/SystemTrayController');
 
@@ -54,6 +55,7 @@ class WallpaperApplication {
     this.settings = null;
     this.discoveryService = null;
     this.weatherService = null;
+    this.calendarService = null;
     this.wallpaperManager = null;
     this.collectionsService = null;
     this.scheduler = null;
@@ -99,6 +101,12 @@ class WallpaperApplication {
       this.weatherService = new WeatherService({
         appSettings: this.settings,
         contextCacheRepo: this.contextCacheRepo
+      });
+
+      this.calendarService = new CalendarService({
+        settingsRepo: this.settingsRepo,
+        calendarEventsRepo: this.calendarEventsRepo,
+        calendarBindingsRepo: this.calendarBindingsRepo
       });
 
       // 5. Initialize Wallpaper & Collections services

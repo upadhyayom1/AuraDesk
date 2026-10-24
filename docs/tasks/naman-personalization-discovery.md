@@ -274,7 +274,7 @@ Implement a `setMockContext({ weather?: string, activeEvent?: CalendarEvent })` 
 - [x] **Step 2: Unsplash & Pexels Adapters**: Implement Axios clients with retry logic (`axios-retry`, max 2 retries, timeout 8s).
 - [x] **Step 3: Discovery Service**: Implement multi-source aggregation, normalization, and Pexels fallback.
 - [x] **Step 4: Weather Service**: Implement OpenWeatherMap API integration with strict 10-minute cache and `isDay` calculation.
-- [ ] **Step 5: Calendar OAuth**: Implement desktop loopback redirect with PKCE and `safeStorage` encryption for tokens.
+- [x] **Step 5: Calendar OAuth**: Implement desktop loopback redirect with PKCE and `safeStorage` encryption for tokens.
 - [ ] **Step 6: Personalization Engine**: Implement the 5-step priority evaluation chain and rule condition matchers.
 - [ ] **Step 7: Mock Context Switch**: Add mock weather and calendar toggles for demoing.
 - [ ] **Step 8: IPC Handlers**: Register all `discovery:*`, `personalization:*`, `rule:*`, `calendar:*`, and `weather:*` channels with Zod validation.
