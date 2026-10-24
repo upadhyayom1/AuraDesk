@@ -16,6 +16,11 @@ const WallpaperRepository = require('../../database/repositories/wallpaperRepo')
 const CollectionsRepository = require('../../database/repositories/collectionsRepo');
 const RotationConfigRepository = require('../../database/repositories/rotationConfigRepo');
 const RotationHistoryRepository = require('../../database/repositories/rotationHistoryRepo');
+const PersonalizationRulesRepository = require('../../database/repositories/personalizationRulesRepo');
+const CalendarBindingsRepository = require('../../database/repositories/calendarBindingsRepo');
+const CalendarEventsRepository = require('../../database/repositories/calendarEventsRepo');
+const ContextCacheRepository = require('../../database/repositories/contextCacheRepo');
+const OverridesRepository = require('../../database/repositories/overridesRepo');
 
 const AppSettings = require('../settings/AppSettings');
 const WallpaperManager = require('../wallpaper/WallpaperManager');
@@ -38,6 +43,11 @@ class WallpaperApplication {
     this.collectionsRepo = null;
     this.rotationConfigRepo = null;
     this.rotationHistoryRepo = null;
+    this.rulesRepo = null;
+    this.calendarBindingsRepo = null;
+    this.calendarEventsRepo = null;
+    this.contextCacheRepo = null;
+    this.overridesRepo = null;
 
     this.settings = null;
     this.wallpaperManager = null;
@@ -67,6 +77,11 @@ class WallpaperApplication {
       this.collectionsRepo = new CollectionsRepository(this.db, this.wallpaperRepo);
       this.rotationConfigRepo = new RotationConfigRepository(this.db);
       this.rotationHistoryRepo = new RotationHistoryRepository(this.db, this.wallpaperRepo);
+      this.rulesRepo = new PersonalizationRulesRepository(this.db);
+      this.calendarBindingsRepo = new CalendarBindingsRepository(this.db);
+      this.calendarEventsRepo = new CalendarEventsRepository(this.db);
+      this.contextCacheRepo = new ContextCacheRepository(this.db);
+      this.overridesRepo = new OverridesRepository(this.db);
 
       // 3. Initialize Settings service and load persistent cache
       this.settings = new AppSettings(this.settingsRepo);
