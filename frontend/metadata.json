@@ -1,0 +1,6 @@
+{
+  "name": "AuraDesk",
+  "description": "Unified macOS-styled desktop wallpaper discovery, intelligent collection manager, context-aware personalization, and dynamic rotation system.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

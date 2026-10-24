@@ -9,19 +9,21 @@ const { ipcSuccess, ipcError } = require('../../utils/ipcResponse');
 
 const WallpaperPreviewSchema = z.object({
   wallpaperId: z.string().optional(),
-  localPath: z.string().optional()
-}).refine((data) => data.wallpaperId || data.localPath, {
-  message: 'Either wallpaperId or localPath must be provided'
+  localPath: z.string().optional(),
+  wallpaper: z.any().optional()
+}).refine((data) => data.wallpaperId || data.localPath || data.wallpaper, {
+  message: 'Either wallpaperId, localPath, or wallpaper must be provided'
 });
 
 const WallpaperApplySchema = z.object({
   wallpaperId: z.string().optional(),
   localPath: z.string().optional(),
+  wallpaper: z.any().optional(),
   trigger: z.enum(['MANUAL', 'ROTATION', 'RULE', 'CALENDAR']).optional().default('MANUAL'),
   collectionId: z.string().optional(),
   ruleId: z.string().optional()
-}).refine((data) => data.wallpaperId || data.localPath, {
-  message: 'Either wallpaperId or localPath must be provided'
+}).refine((data) => data.wallpaperId || data.localPath || data.wallpaper, {
+  message: 'Either wallpaperId, localPath, or wallpaper must be provided'
 });
 
 /**
@@ -38,7 +40,7 @@ function registerWallpaperHandlers(wallpaperManager, getMainWindow) {
         return ipcError('VALIDATION', parsed.error.issues[0]?.message);
       }
 
-      const target = parsed.data.wallpaperId || {
+      const target = parsed.data.wallpaper || parsed.data.wallpaperId || {
         id: `local:${parsed.data.localPath}`,
         source: 'local',
         localPath: parsed.data.localPath,
@@ -60,7 +62,7 @@ function registerWallpaperHandlers(wallpaperManager, getMainWindow) {
         return ipcError('VALIDATION', parsed.error.issues[0]?.message);
       }
 
-      let target = parsed.data.wallpaperId;
+      let target = parsed.data.wallpaper || parsed.data.wallpaperId;
       if (!target && parsed.data.localPath) {
         target = {
           id: `local:${parsed.data.localPath}`,
