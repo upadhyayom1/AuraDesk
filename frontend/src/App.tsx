@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { WallpaperProvider, useWallpaper } from './context/WallpaperContext';
-import { MacMenuBar } from './components/MacMenuBar';
 import { MacSidebar, ActiveTab } from './components/MacSidebar';
 import { MacTrayMenu } from './components/MacTrayMenu';
-import { DesktopSimulator } from './components/DesktopSimulator';
 import { WallpaperDiscovery } from './components/WallpaperDiscovery';
 import { CollectionsView } from './components/CollectionsView';
 import { HistoryTrayView } from './components/HistoryTrayView';
@@ -84,7 +82,6 @@ const AuraDeskApp: React.FC = () => {
           <div className="flex items-center gap-2 app-no-drag">
             <span className={`font-semibold capitalize text-sm tracking-wide ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
               {activeTab === 'discovery' && 'Explore 5K & 4K Wallpapers'}
-              {activeTab === 'desktop' && 'Live Desktop Simulation & Display Engine'}
               {activeTab === 'collections' && 'Collection Manager & Playlists'}
               {activeTab === 'history' && 'Rotation History & Instant Rollback'}
             </span>
@@ -156,11 +153,9 @@ const AuraDeskApp: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-4 md:p-6">
           {activeTab === 'discovery' && (
             <WallpaperDiscovery
-              onPreviewOnDesktop={() => setActiveTab('desktop')}
               onOpenAddCustom={() => setIsAddCustomOpen(true)}
             />
           )}
-          {activeTab === 'desktop' && <DesktopSimulator />}
           {activeTab === 'collections' && (
             <CollectionsView onOpenAddCustom={() => setIsAddCustomOpen(true)} />
           )}

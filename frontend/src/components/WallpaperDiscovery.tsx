@@ -18,12 +18,10 @@ import {
 import { Wallpaper, WallpaperCategory } from '../types/wallpaper';
 
 interface WallpaperDiscoveryProps {
-  onPreviewOnDesktop: () => void;
   onOpenAddCustom: () => void;
 }
 
 export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
-  onPreviewOnDesktop,
   onOpenAddCustom,
 }) => {
   const {
@@ -224,27 +222,16 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-xs flex items-center justify-center gap-2.5 z-20">
                     <button
                       onClick={() => applyWallpaper(wall, 'manual')}
-                      className="px-3.5 py-2 rounded-xl bg-white text-slate-950 hover:bg-white/90 font-medium text-xs shadow-xl active:scale-95 transition-all flex items-center gap-1.5"
-                      title="Apply as desktop wallpaper"
+                      className="px-4 py-2 rounded-xl bg-white text-slate-950 hover:bg-cyan-50 font-semibold text-xs shadow-xl active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+                      title="Apply as system desktop wallpaper"
                     >
                       <Sparkles className="w-3.5 h-3.5 text-cyan-600" />
-                      <span>Set Desktop</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        applyWallpaper(wall, 'manual');
-                        onPreviewOnDesktop();
-                      }}
-                      className="p-2 rounded-xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/30 active:scale-95 transition-all"
-                      title="Preview on MacBook screen"
-                    >
-                      <Monitor className="w-4 h-4" />
+                      <span>Set Wallpaper</span>
                     </button>
 
                     <button
                       onClick={() => setSelectedWallpaperForDetails(wall)}
-                      className="p-2 rounded-xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/30 active:scale-95 transition-all"
+                      className="p-2 rounded-xl bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/30 active:scale-95 transition-all cursor-pointer"
                       title="Wallpaper details & specs"
                     >
                       <Info className="w-4 h-4" />

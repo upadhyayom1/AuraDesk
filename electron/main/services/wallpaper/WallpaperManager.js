@@ -25,6 +25,9 @@ class WallpaperManager {
 
     const baseTemp = app ? app.getPath('temp') : (process.env.TEMP || '/tmp');
     this.tempDir = path.join(baseTemp, 'auradesk');
+
+    const userData = app ? app.getPath('userData') : (process.env.APPDATA || path.join(process.env.HOME || '/tmp', '.auradesk'));
+    this.appliedDir = path.join(userData, 'applied_wallpapers');
   }
 
   /**
@@ -33,6 +36,9 @@ class WallpaperManager {
   async init() {
     if (!fs.existsSync(this.tempDir)) {
       fs.mkdirSync(this.tempDir, { recursive: true });
+    }
+    if (!fs.existsSync(this.appliedDir)) {
+      fs.mkdirSync(this.appliedDir, { recursive: true });
     }
 
     // Temp Sweeper: Clean up leftover temporary files on startup
@@ -214,8 +220,31 @@ class WallpaperManager {
     // 2. Fetch image buffer
     const inputBuffer = await this.getImageBuffer(wp);
 
-    // 3. Scale and crop to physical display dimensions
-    const croppedTempFile = await this.scaleAndCrop(inputBuffer);
+    // 3. Scale and crop to physical display dimensions and write persistently
+    const sanitizedId = String(wp.id || 'wp').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const persistentFilePath = path.join(this.appliedDir, `active_${sanitizedId}_${Date.now()}.jpg`);
+
+    let targetWidth = 1920;
+    let targetHeight = 1080;
+    if (screen) {
+      const primary = screen.getPrimaryDisplay();
+      if (primary) {
+        const factor = primary.scaleFactor || 1;
+        targetWidth = Math.round(primary.size.width * factor);
+        targetHeight = Math.round(primary.size.height * factor);
+      }
+    }
+
+    await sharp(inputBuffer)
+      .resize(targetWidth, targetHeight, {
+        fit: 'cover',
+        position: 'attention'
+      })
+      .jpeg({
+        quality: 95,
+        chromaSubsampling: '4:4:4'
+      })
+      .toFile(persistentFilePath);
 
     let setWallpaperFn = null;
     try {
@@ -226,19 +255,41 @@ class WallpaperManager {
         throw new Error('wallpaper module does not expose setWallpaper function');
       }
 
-      // 5. Set OS wallpaper
-      await setWallpaperFn(croppedTempFile);
+      // 5. Set real OS desktop wallpaper
+      await setWallpaperFn(persistentFilePath, { screen: 'all', scale: 'auto' });
+      console.log(`[WallpaperManager] Set system desktop wallpaper: ${persistentFilePath}`);
     } catch (err) {
-      // Cleanup temp file on failure
-      if (fs.existsSync(croppedTempFile)) {
-        try { fs.unlinkSync(croppedTempFile); } catch (e) {}
+      // Fallback on macOS using AppleScript / osascript if module has permission or path issues
+      if (process.platform === 'darwin') {
+        try {
+          const { promisify } = require('util');
+          const childProcess = require('child_process');
+          const execFile = promisify(childProcess.execFile);
+          const script = `tell application "System Events" to tell every desktop to set picture to "${persistentFilePath}"`;
+          await execFile('osascript', ['-e', script]);
+          console.log(`[WallpaperManager] Set desktop wallpaper via macOS osascript fallback: ${persistentFilePath}`);
+        } catch (osaErr) {
+          throw new Error(`Failed to apply OS wallpaper: ${err.message} (fallback: ${osaErr.message})`);
+        }
+      } else {
+        throw new Error(`Failed to apply OS wallpaper: ${err.message}`);
       }
-      throw new Error(`Failed to apply OS wallpaper: ${err.message}`);
     }
 
-    // 6. Delete temp file after successful apply
-    if (fs.existsSync(croppedTempFile)) {
-      try { fs.unlinkSync(croppedTempFile); } catch (e) {}
+    // 6. Clean up older applied files, retaining the newest 3 so OS always has valid file handles
+    try {
+      const allFiles = fs.readdirSync(this.appliedDir)
+        .filter(f => f.startsWith('active_'))
+        .map(f => ({ name: f, time: fs.statSync(path.join(this.appliedDir, f)).mtimeMs }))
+        .sort((a, b) => b.time - a.time);
+
+      for (let i = 3; i < allFiles.length; i++) {
+        try {
+          fs.unlinkSync(path.join(this.appliedDir, allFiles[i].name));
+        } catch (e) {}
+      }
+    } catch (cleanErr) {
+      console.warn('[WallpaperManager] Prune warning:', cleanErr.message);
     }
 
     // 7. Record History ONLY upon success

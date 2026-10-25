@@ -88,10 +88,22 @@ export const electronBridge = {
     }
 
     try {
+      const isLocal = Boolean(
+        wallpaper.isCustom ||
+        wallpaper.imageUrl.startsWith('file://') ||
+        wallpaper.imageUrl.startsWith('/') ||
+        (wallpaper as any).localPath
+      );
+      const resolvedLocalPath = (wallpaper as any).localPath || (
+        wallpaper.imageUrl.startsWith('file://')
+          ? decodeURIComponent(wallpaper.imageUrl.replace('file://', ''))
+          : (wallpaper.imageUrl.startsWith('/') ? wallpaper.imageUrl : undefined)
+      );
+
       const payload = {
         wallpaper: {
           id: wallpaper.id,
-          source: wallpaper.isCustom ? 'local' : 'online',
+          source: isLocal ? 'local' : 'online',
           title: wallpaper.title,
           description: wallpaper.category || '',
           imageUrl: wallpaper.imageUrl,
@@ -100,7 +112,7 @@ export const electronBridge = {
           creditUrl: wallpaper.sourceCredit || '',
           width: wallpaper.width || 3840,
           height: wallpaper.height || 2160,
-          localPath: wallpaper.imageUrl.startsWith('file://') ? wallpaper.imageUrl.replace('file://', '') : undefined,
+          localPath: resolvedLocalPath,
         },
         trigger,
         collectionId,

@@ -20,7 +20,6 @@ import {
 
 export type ActiveTab =
   | 'discovery'
-  | 'desktop'
   | 'collections'
   | 'history';
 
@@ -55,7 +54,6 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
 
   const mainNavItems = [
     { id: 'discovery' as ActiveTab, label: 'Explore Wallpapers', icon: Compass, count: wallpapers.length },
-    { id: 'desktop' as ActiveTab, label: 'Desktop Simulator', icon: Monitor },
     { id: 'collections' as ActiveTab, label: 'Collections', icon: FolderHeart, count: collections.length },
     { id: 'history' as ActiveTab, label: 'Rotation History', icon: History },
   ];
@@ -259,7 +257,7 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
           />
           <div className="min-w-0 flex-1">
             <p className={`text-[10px] font-mono truncate uppercase ${isWhitish ? 'text-cyan-700 font-bold' : 'text-cyan-300'}`}>
-              Applied
+              System Wallpaper
             </p>
             <p className={`text-xs font-medium truncate ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
               {currentWallpaper.title}
