@@ -14,7 +14,9 @@
     "build:dir": "npm run build:frontend && electron-builder --dir",
     "build:dmg": "npm run build:frontend && electron-builder --mac dmg",
     "install:all": "npm install && npm --prefix frontend install",
-    "rebuild": "electron-builder install-app-deps"
+    "rebuild": "electron-builder install-app-deps",
+    "test": "node tests/step2.test.js && node tests/step3.test.js && node tests/discovery_integration.test.js",
+    "test:all": "ELECTRON_RUN_AS_NODE=1 npx electron tests/step1.test.js && node tests/step2.test.js && node tests/step3.test.js && ELECTRON_RUN_AS_NODE=1 npx electron tests/step4.test.js && ELECTRON_RUN_AS_NODE=1 npx electron tests/step5.test.js && ELECTRON_RUN_AS_NODE=1 npx electron tests/step6.test.js && node tests/discovery_integration.test.js"
   },
   "build": {
     "appId": "com.auradesk.app",

@@ -38,6 +38,7 @@ const { registerCollectionsHandlers } = require('../../ipc/handlers/collectionsH
 const { registerSettingsHandlers } = require('../../ipc/handlers/settingsHandler');
 const { registerAppHandlers } = require('../../ipc/handlers/appHandler');
 const { registerRotationHandlers } = require('../../ipc/handlers/rotationHandler');
+const { registerDiscoveryHandlers } = require('../../ipc/handlers/discoveryHandler');
 
 class WallpaperApplication {
   constructor() {
@@ -147,6 +148,7 @@ class WallpaperApplication {
       await this.scheduler.init();
 
       // 6. Register all IPC channel handlers
+      registerDiscoveryHandlers(this.discoveryService);
       registerWallpaperHandlers(this.wallpaperManager, () => this.mainWindow);
       registerCollectionsHandlers(this.collectionsService, () => this.mainWindow);
       registerSettingsHandlers(this.settings);

@@ -46,5 +46,10 @@ Thumbs.db
 *.sln
 *.sw?
 
+# AI Studio & Archives
+.aistudio
+frontend/.aistudio
+*.zip
+
 # Keep gitkeep files
 !.gitkeep

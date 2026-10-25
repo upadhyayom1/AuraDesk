@@ -68,8 +68,177 @@ export interface BackendHistoryEntry {
   };
 }
 
+export interface DiscoverySearchResult {
+  items: Wallpaper[];
+  page: number;
+  perPage: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface DiscoverySearchOptions {
+  query: string;
+  source?: 'unsplash' | 'pexels' | 'all';
+  orientation?: 'landscape' | 'portrait' | 'squarish';
+  color?: string;
+  page?: number;
+  perPage?: number;
+}
+
+export interface DiscoveryBrowseOptions {
+  source?: 'unsplash' | 'pexels' | 'all';
+  page?: number;
+  perPage?: number;
+}
+
+export interface DiscoverySourceStatus {
+  name: string;
+  enabled: boolean;
+  ok: boolean;
+}
+
+export function normalizeBackendWallpaper(raw: any, fallbackCategory: Wallpaper['category'] = 'nature'): Wallpaper {
+  const width = Number(raw.width) || 3840;
+  const height = Number(raw.height) || 2160;
+  const ratioVal = width / (height || 1);
+  let aspectRatio = '16:9';
+  if (Math.abs(ratioVal - 16 / 10) < 0.08) aspectRatio = '16:10';
+  else if (Math.abs(ratioVal - 21 / 9) < 0.15) aspectRatio = '21:9';
+  else if (Math.abs(ratioVal - 1) < 0.1) aspectRatio = '1:1';
+
+  const photographer = (raw.photographer || 'Online Contributor').trim();
+  const sourceName = raw.source === 'unsplash' ? 'Unsplash' : raw.source === 'pexels' ? 'Pexels' : 'AuraDesk';
+  const creditUrl = raw.creditUrl || (raw.source === 'unsplash' ? 'https://unsplash.com' : 'https://pexels.com');
+
+  return {
+    id: raw.id,
+    title: raw.title || `${sourceName} Wallpaper`,
+    imageUrl: raw.imageUrl || raw.thumbUrl || '',
+    thumbUrl: raw.thumbUrl || raw.imageUrl || '',
+    sourceCredit: `${photographer} (${sourceName})`,
+    sourceUrl: creditUrl,
+    photographer,
+    creditUrl,
+    source: raw.source || 'unsplash',
+    description: raw.description || '',
+    category: fallbackCategory,
+    width,
+    height,
+    aspectRatio,
+    tags: raw.tags || [raw.source || 'discovery', 'online'],
+    isCustom: false,
+  };
+}
+
 export const electronBridge = {
   isAvailable: isElectron,
+
+  // ==========================================
+  // DISCOVERY ENGINE (UNSPLASH & PEXELS)
+  // ==========================================
+
+  /**
+   * Searches live online discovery sources (Unsplash & Pexels) concurrently
+   */
+  async searchWallpapers(options: DiscoverySearchOptions): Promise<{ success: boolean; data?: DiscoverySearchResult; error?: string; code?: string }> {
+    if (!isElectron()) {
+      return { success: false, error: 'Electron discovery unavailable in browser mode', code: 'OFFLINE' };
+    }
+    try {
+      const res = await window.api!.invoke('discovery:search', options);
+      if (!res || !res.ok) {
+        return { success: false, error: res?.error?.message || 'Search failed', code: res?.error?.code || 'INTERNAL_ERROR' };
+      }
+      const rawData = res.data || {};
+      const normalizedItems = (rawData.items || []).map((item: any) => normalizeBackendWallpaper(item));
+      return {
+        success: true,
+        data: {
+          items: normalizedItems,
+          page: rawData.page || 1,
+          perPage: rawData.perPage || 20,
+          total: rawData.total || normalizedItems.length,
+          totalPages: rawData.totalPages || 1,
+        }
+      };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Discovery search error', code: 'INTERNAL_ERROR' };
+    }
+  },
+
+  /**
+   * Fetches curated / popular browse feed from configured discovery sources
+   */
+  async browseWallpapers(options: DiscoveryBrowseOptions = {}): Promise<{ success: boolean; data?: DiscoverySearchResult; error?: string; code?: string }> {
+    if (!isElectron()) {
+      return { success: false, error: 'Electron discovery unavailable in browser mode', code: 'OFFLINE' };
+    }
+    try {
+      const res = await window.api!.invoke('discovery:browse', options);
+      if (!res || !res.ok) {
+        return { success: false, error: res?.error?.message || 'Browse failed', code: res?.error?.code || 'INTERNAL_ERROR' };
+      }
+      const rawData = res.data || {};
+      const normalizedItems = (rawData.items || []).map((item: any) => normalizeBackendWallpaper(item));
+      return {
+        success: true,
+        data: {
+          items: normalizedItems,
+          page: rawData.page || 1,
+          perPage: rawData.perPage || 20,
+          total: rawData.total || normalizedItems.length,
+          totalPages: rawData.totalPages || 1,
+        }
+      };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Discovery browse error', code: 'INTERNAL_ERROR' };
+    }
+  },
+
+  /**
+   * Gets single wallpaper metadata by universal ID
+   */
+  async getWallpaperDetails(wallpaperId: string): Promise<Wallpaper | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('discovery:get', { wallpaperId });
+      if (res?.ok && res.data) {
+        return normalizeBackendWallpaper(res.data);
+      }
+      return null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to get wallpaper details:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Retrieves photographer credits and external profile link
+   */
+  async getCredits(wallpaperId: string): Promise<{ photographer: string; creditUrl: string; source: string } | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('discovery:credits', { wallpaperId });
+      return res?.ok ? res.data : null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to get credits:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Checks connectivity and key status for discovery providers
+   */
+  async getDiscoverySources(): Promise<DiscoverySourceStatus[]> {
+    if (!isElectron()) return [];
+    try {
+      const res = await window.api!.invoke('discovery:sources');
+      return res?.ok && Array.isArray(res.data) ? res.data : [];
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to get discovery sources:', err);
+      return [];
+    }
+  },
 
   // ==========================================
   // WALLPAPER ENGINE & DESKTOP DISPLAY

@@ -18,6 +18,7 @@ export interface Wallpaper {
   id: string;
   title: string;
   imageUrl: string;
+  thumbUrl?: string;
   sourceCredit: string;
   sourceUrl?: string;
   category: WallpaperCategory;
@@ -28,6 +29,10 @@ export interface Wallpaper {
   recommendedTime?: TimeOfDay[];
   recommendedWeather?: WeatherCondition[];
   isCustom?: boolean;
+  photographer?: string;
+  creditUrl?: string;
+  source?: 'unsplash' | 'pexels' | 'local';
+  description?: string;
 }
 
 export interface WallpaperCollection {

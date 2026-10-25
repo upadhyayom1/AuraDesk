@@ -28,11 +28,11 @@ interface IPCResponse<T = any> {
 ### 2.1 Discovery (Multiversal Portal)
 | Channel | Service | Payload | Return Data (`data`) | Description |
 | :--- | :--- | :--- | :--- | :--- |
-| `discovery:search` | Discovery | `{ query: string, source?: string, orientation?: string, color?: string, page: number, perPage: number }` | `{ items: Wallpaper[], page: number, totalPages: number }` | Searches online providers (Unsplash + Pexels concurrently). |
-| `discovery:browse` | Discovery | `{ source?: string, page: number }` | `{ items: Wallpaper[], page: number, totalPages: number }` | Curated/popular feed shown before user initiates a query. |
+| `discovery:search` | Discovery | `{ query: string, source?: 'unsplash' \| 'pexels' \| 'all', orientation?: 'landscape' \| 'portrait' \| 'squarish', color?: string, page?: number, perPage?: number }` | `{ items: Wallpaper[], page: number, perPage: number, total: number, totalPages: number }` | Searches online providers (Unsplash + Pexels concurrently with 5-minute cache and failover). |
+| `discovery:browse` | Discovery | `{ source?: 'unsplash' \| 'pexels' \| 'all', page?: number, perPage?: number }` | `{ items: Wallpaper[], page: number, perPage: number, total: number, totalPages: number }` | Curated/popular feed shown before user initiates a query. |
 | `discovery:get` | Discovery | `{ wallpaperId: string }` | `Wallpaper` | Full metadata: photographer, resolution, URLs. |
-| `discovery:credits` | Discovery | `{ wallpaperId: string }` | `{ photographer: string, profileUrl: string, sourceName: string, sourceUrl: string }` | Attribution info for preview modal. |
-| `discovery:sources` | Discovery | `void` | `Array<{ name: string, enabled: boolean, ok: boolean }>` | Connectivity status of external image providers. |
+| `discovery:credits` | Discovery | `{ wallpaperId: string }` | `{ photographer: string, creditUrl: string, source: string }` | Attribution info for preview modal and external profile link. |
+| `discovery:sources` | Discovery | `void` | `Array<{ name: string, enabled: boolean, ok: boolean }>` | Connectivity and credential status of external image providers (never leaks keys). |
 
 ---
 

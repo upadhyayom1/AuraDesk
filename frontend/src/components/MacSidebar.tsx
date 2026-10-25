@@ -52,7 +52,7 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
 
   const isWhitish = glassTheme === 'whitish';
 
-  const mainNavItems = [
+  const mainNavItems: Array<{ id: ActiveTab; label: string; icon: any; count?: number; highlight?: boolean }> = [
     { id: 'discovery' as ActiveTab, label: 'Explore Wallpapers', icon: Compass, count: wallpapers.length },
     { id: 'collections' as ActiveTab, label: 'Collections', icon: FolderHeart, count: collections.length },
     { id: 'history' as ActiveTab, label: 'Rotation History', icon: History },
