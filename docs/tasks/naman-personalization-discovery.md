@@ -276,7 +276,7 @@ Implement a `setMockContext({ weather?: string, activeEvent?: CalendarEvent })` 
 - [x] **Step 4: Weather Service**: Implement OpenWeatherMap API integration with strict 10-minute cache and `isDay` calculation.
 - [x] **Step 5: Calendar OAuth**: Implement desktop loopback redirect with PKCE and `safeStorage` encryption for tokens.
 - [x] **Step 6: Personalization Engine**: Implement the 5-step priority evaluation chain and rule condition matchers.
-- [ ] **Step 7: Mock Context Switch**: Add mock weather and calendar toggles for demoing.
+- [x] **Step 7: Mock Context Switch**: Add mock weather and calendar toggles for demoing.
 - [ ] **Step 8: IPC Handlers**: Register all `discovery:*`, `personalization:*`, `rule:*`, `calendar:*`, and `weather:*` channels with Zod validation.
 - [ ] **Step 9: Verification**:
   - Test searching returns normalized Unsplash + Pexels results.
