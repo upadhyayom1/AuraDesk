@@ -47,7 +47,7 @@ class PersonalizationEngine {
 
   /**
    * Sets mock environmental state (for testing, demoing, and live judges evaluation)
-   * @param {{ weather?: string, tempC?: number, isDay?: boolean, dayPart?: string, activeEvent?: Object } | null} mock
+   * @param {{ weather?: string, tempC?: number, isDay?: boolean, dayPart?: string, activeEvent?: Object, now?: string } | null} mock
    */
   setMockContext(mock) {
     this.mockContext = mock ? { ...mock } : null;
@@ -66,6 +66,107 @@ class PersonalizationEngine {
    */
   clearMockContext() {
     this.mockContext = null;
+  }
+
+  /**
+   * Convenience toggle for mock weather (e.g. 'Rain', 'Clear', 'Snow')
+   * @param {string} weatherCondition
+   * @param {Object} [extraOptions={}]
+   * @returns {Object|null} current mock context
+   */
+  toggleMockWeather(weatherCondition, extraOptions = {}) {
+    if (this.mockContext?.weather?.toLowerCase() === weatherCondition.toLowerCase()) {
+      delete this.mockContext.weather;
+      delete this.mockContext.tempC;
+      if (!this.mockContext.activeEvent && !this.mockContext.now) {
+        this.mockContext = null;
+      }
+    } else {
+      this.mockContext = {
+        ...(this.mockContext || {}),
+        weather: weatherCondition,
+        ...extraOptions
+      };
+    }
+    return this.mockContext;
+  }
+
+  /**
+   * Convenience toggle for mock calendar event (e.g. 'Softablitz Final Exam')
+   * @param {string|Object} eventOrSummary
+   * @returns {Object|null} current mock context
+   */
+  toggleMockCalendarEvent(eventOrSummary) {
+    const summary = typeof eventOrSummary === 'string'
+      ? eventOrSummary
+      : (eventOrSummary?.summary || eventOrSummary?.title || 'Mock Event');
+
+    if (this.mockContext?.activeEvent?.title?.toLowerCase() === summary.toLowerCase()) {
+      delete this.mockContext.activeEvent;
+      if (!this.mockContext.weather && !this.mockContext.now) {
+        this.mockContext = null;
+      }
+    } else {
+      const activeEvent = typeof eventOrSummary === 'object' && eventOrSummary.id
+        ? eventOrSummary
+        : {
+            id: 'mock-event-id',
+            title: summary,
+            startTime: new Date().toISOString(),
+            endTime: new Date(Date.now() + 3600000).toISOString()
+          };
+
+      this.mockContext = {
+        ...(this.mockContext || {}),
+        activeEvent
+      };
+    }
+    return this.mockContext;
+  }
+
+  /**
+   * Convenience toggle for mock time (e.g. '23:30', '03:00')
+   * @param {string} timeHHMM
+   * @param {'dawn'|'day'|'dusk'|'night'} [dayPart]
+   */
+  setMockTime(timeHHMM, dayPart = null) {
+    const [hours, minutes] = timeHHMM.split(':').map(Number);
+    const mockDate = new Date();
+    mockDate.setHours(hours, minutes, 0, 0);
+
+    const isDay = hours >= 6 && hours < 18;
+    this.mockContext = {
+      ...(this.mockContext || {}),
+      now: mockDate.toISOString(),
+      isDay,
+      dayPart: dayPart || (isDay ? 'day' : 'night')
+    };
+    return this.mockContext;
+  }
+
+  /**
+   * Evaluates rules against mock context and optionally applies wallpaper immediately.
+   * Perfect for live demo day presentation!
+   * @param {import('../wallpaper/WallpaperManager')} [wallpaperManager]
+   * @returns {Promise<{ decision: Object, applied: boolean }>}
+   */
+  async evaluateAndApplyMock(wallpaperManager = null) {
+    const context = await this.getContext();
+    const decision = await this.chooseWallpaper(context);
+
+    let applied = false;
+    const wm = wallpaperManager || this.wallpaperManager;
+
+    if (decision && decision.wallpaper && wm && typeof wm.apply === 'function') {
+      await wm.apply(decision.wallpaper, decision.trigger, decision.collectionId);
+      applied = true;
+    }
+
+    return {
+      decision,
+      applied,
+      context
+    };
   }
 
   /**

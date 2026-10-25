@@ -45,6 +45,9 @@ export const IPC_CHANNELS = {
   RULE_DELETE: 'rule:delete',
   RULE_REORDER: 'rule:reorder',
   PERSONALIZATION_EVALUATE: 'personalization:evaluate',
+  PERSONALIZATION_SET_MOCK_CONTEXT: 'personalization:setMockContext',
+  PERSONALIZATION_GET_MOCK_CONTEXT: 'personalization:getMockContext',
+  PERSONALIZATION_CLEAR_MOCK_CONTEXT: 'personalization:clearMockContext',
   OVERRIDE_SET: 'override:set',
   OVERRIDE_CLEAR: 'override:clear',
 
