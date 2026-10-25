@@ -68,13 +68,63 @@ const AppSettingsSchema = z.object({
 
 const AppSettingsPatchSchema = AppSettingsSchema.partial();
 
+const DiscoveryBrowseSchema = z.object({
+  source: z.enum(['unsplash', 'pexels', 'all']).optional().default('all'),
+  page: z.number().int().min(1).default(1),
+  perPage: z.number().int().min(1).max(50).default(20)
+});
+
+const DiscoveryGetSchema = z.object({
+  wallpaperId: z.string().min(1)
+});
+
+const RuleUpdateSchema = z.object({
+  id: z.string().min(1),
+  patch: z.object({
+    name: z.string().min(1).max(100).optional(),
+    conditionType: z.enum(['TIME_RANGE', 'WEATHER', 'DAY_PART']).optional(),
+    conditionValue: z.union([z.string(), z.record(z.any())]).optional(),
+    collectionId: z.string().optional(),
+    priority: z.number().int().optional(),
+    enabled: z.boolean().optional()
+  })
+});
+
+const RuleReorderSchema = z.object({
+  ruleIds: z.array(z.string().min(1))
+});
+
+const CalendarUpcomingSchema = z.object({
+  hours: z.number().min(1).max(168).default(24)
+});
+
+const CalendarBindingCreateSchema = z.object({
+  matchType: z.enum(['KEYWORD', 'EVENT_ID']).default('KEYWORD'),
+  matchValue: z.string().min(1).trim(),
+  collectionId: z.string().min(1),
+  priority: z.number().int().optional()
+});
+
+const OverrideSetSchema = z.object({
+  wallpaperId: z.string().optional(),
+  localPath: z.string().optional(),
+  expiresAt: z.string().nullable().optional()
+});
+
 module.exports = {
   WallpaperSchema,
   DiscoverySearchSchema,
+  DiscoveryBrowseSchema,
+  DiscoveryGetSchema,
   CollectionCreateSchema,
   RuleCreateSchema,
+  RuleUpdateSchema,
+  RuleReorderSchema,
   RotationConfigSchema,
   WeatherSetLocationSchema,
   AppSettingsSchema,
-  AppSettingsPatchSchema
+  AppSettingsPatchSchema,
+  CalendarUpcomingSchema,
+  CalendarBindingCreateSchema,
+  OverrideSetSchema
 };

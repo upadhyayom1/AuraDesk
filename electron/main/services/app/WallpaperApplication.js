@@ -39,6 +39,8 @@ const { registerSettingsHandlers } = require('../../ipc/handlers/settingsHandler
 const { registerAppHandlers } = require('../../ipc/handlers/appHandler');
 const { registerRotationHandlers } = require('../../ipc/handlers/rotationHandler');
 const { registerDiscoveryHandlers } = require('../../ipc/handlers/discoveryHandler');
+const { registerPersonalizationHandlers } = require('../../ipc/handlers/personalizationHandler');
+const { registerCalendarWeatherHandlers } = require('../../ipc/handlers/calendarWeatherHandler');
 
 class WallpaperApplication {
   constructor() {
@@ -147,18 +149,20 @@ class WallpaperApplication {
       this.personalizationEngine.rotationScheduler = this.scheduler;
       await this.scheduler.init();
 
-      // 6. Register all IPC channel handlers
-      registerDiscoveryHandlers(this.discoveryService);
+      // 8. Register all IPC channel handlers
       registerWallpaperHandlers(this.wallpaperManager, () => this.mainWindow);
       registerCollectionsHandlers(this.collectionsService, () => this.mainWindow);
       registerSettingsHandlers(this.settings);
       registerAppHandlers(this.settings, () => this.mainWindow, () => this.shutdown());
       registerRotationHandlers(this.scheduler, this.rotationHistoryRepo);
+      registerDiscoveryHandlers(this.discoveryService);
+      registerPersonalizationHandlers(this.personalizationEngine, this.settings, () => this.mainWindow);
+      registerCalendarWeatherHandlers(this.calendarService, this.weatherService);
 
-      // 7. Create Main Window
+      // 9. Create Main Window
       this.createMainWindow();
 
-      // 8. Initialize System Tray Controller with keep-alive
+      // 10. Initialize System Tray Controller with keep-alive
       this.trayController = new SystemTrayController({
         getMainWindow: () => this.mainWindow,
         scheduler: this.scheduler,
