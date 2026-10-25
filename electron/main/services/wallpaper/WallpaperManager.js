@@ -150,7 +150,21 @@ class WallpaperManager {
     const isRemote = url.startsWith('http://') || url.startsWith('https://');
 
     if (wp.source === 'local' && !isRemote) {
-      const localPath = wp.localPath || url.replace(/^file:\/\//, '');
+      let localPath = wp.localPath;
+      if (!localPath && url.startsWith('file://')) {
+        try {
+          const { fileURLToPath } = require('url');
+          localPath = fileURLToPath(url);
+        } catch {
+          localPath = url.replace(/^file:\/\//, '');
+        }
+      }
+      if (!localPath) {
+        localPath = url.replace(/^file:\/\//, '');
+      }
+      if (process.platform === 'win32' && localPath.startsWith('/') && /^\/[a-zA-Z]:/.test(localPath)) {
+        localPath = localPath.slice(1);
+      }
       if (!fs.existsSync(localPath)) {
         throw new Error(`Local file not found on disk: ${localPath}`);
       }
@@ -261,7 +275,7 @@ class WallpaperManager {
       await setWallpaperFn(persistentFilePath, { screen: 'all', scale: 'auto' });
       console.log(`[WallpaperManager] Set system desktop wallpaper: ${persistentFilePath}`);
     } catch (err) {
-      // Fallback on macOS using AppleScript / osascript if module has permission or path issues
+      // Platform-specific fallbacks if npm wallpaper module has execution issues
       if (process.platform === 'darwin') {
         try {
           const { promisify } = require('util');
@@ -272,6 +286,18 @@ class WallpaperManager {
           console.log(`[WallpaperManager] Set desktop wallpaper via macOS osascript fallback: ${persistentFilePath}`);
         } catch (osaErr) {
           throw new Error(`Failed to apply OS wallpaper: ${err.message} (fallback: ${osaErr.message})`);
+        }
+      } else if (process.platform === 'win32') {
+        try {
+          const { promisify } = require('util');
+          const childProcess = require('child_process');
+          const execFile = promisify(childProcess.execFile);
+          // Windows User32 SystemParametersInfoW fallback via PowerShell
+          const psCommand = `Add-Type -TypeDefinition 'using System.Runtime.InteropServices; public class Wp { [DllImport("user32.dll", SetLastError=true, CharSet=CharSet.Auto)] public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni); };'; [Wp]::SystemParametersInfo(0x0014, 0, '${persistentFilePath.replace(/'/g, "''")}', 0x01 -bor 0x02)`;
+          await execFile('powershell', ['-NoProfile', '-NonInteractive', '-Command', psCommand]);
+          console.log(`[WallpaperManager] Set desktop wallpaper via Windows PowerShell fallback: ${persistentFilePath}`);
+        } catch (winErr) {
+          throw new Error(`Failed to apply OS wallpaper on Windows: ${err.message} (fallback: ${winErr.message})`);
         }
       } else {
         throw new Error(`Failed to apply OS wallpaper: ${err.message}`);

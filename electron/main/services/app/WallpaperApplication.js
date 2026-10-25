@@ -186,7 +186,10 @@ class WallpaperApplication {
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width, height } = primaryDisplay.workAreaSize;
 
-    this.mainWindow = new BrowserWindow({
+    const isMac = process.platform === 'darwin';
+    const isWin = process.platform === 'win32';
+
+    const windowOpts = {
       width: Math.min(1380, width),
       height: Math.min(880, height),
       minWidth: 1024,
@@ -194,18 +197,25 @@ class WallpaperApplication {
       backgroundColor: '#090d16',
       title: 'AuraDesk',
       titleBarStyle: 'hidden',
-      trafficLightPosition: { x: -100, y: -100 },
-      vibrancy: 'under-window',
-      visualEffectState: 'active',
       webPreferences: {
         preload: path.join(__dirname, '../../../preload/index.js'),
         contextIsolation: true,
         nodeIntegration: false,
         sandbox: true
       }
-    });
+    };
 
-    if (process.platform === 'darwin') {
+    if (isMac) {
+      windowOpts.trafficLightPosition = { x: -100, y: -100 };
+      windowOpts.vibrancy = 'under-window';
+      windowOpts.visualEffectState = 'active';
+    } else if (isWin) {
+      windowOpts.backgroundMaterial = 'acrylic';
+    }
+
+    this.mainWindow = new BrowserWindow(windowOpts);
+
+    if (isMac) {
       try {
         this.mainWindow.setWindowButtonVisibility?.(false);
       } catch {

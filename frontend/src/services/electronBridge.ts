@@ -11,6 +11,10 @@ export const isElectron = (): boolean => {
   return typeof window !== 'undefined' && Boolean(window.api && typeof window.api.invoke === 'function');
 };
 
+export const getPlatform = (): string => {
+  return (typeof window !== 'undefined' && window.api?.platform) || (typeof navigator !== 'undefined' && navigator.platform?.toLowerCase().includes('win') ? 'win32' : 'darwin');
+};
+
 export interface BackendCollectionSummary {
   id: string;
   name: string;

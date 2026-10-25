@@ -92,6 +92,8 @@ const ALLOWED_EVENTS = new Set([
 
 // Expose safe, allowlisted, context-isolated API to renderer
 contextBridge.exposeInMainWorld('api', {
+  platform: process.platform,
+
   /**
    * Generic allowlisted invoke method
    * @param {string} channel
