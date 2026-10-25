@@ -47,6 +47,9 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
     glassTheme,
     setGlassTheme,
     minimizeAppToTray,
+    closeWindow,
+    minimizeWindow,
+    toggleMaximizeWindow,
     isNativeElectron,
   } = useWallpaper();
 
@@ -68,57 +71,106 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
     >
       {/* Top Window Controls & Branding */}
       <div className="space-y-4">
-        {/* macOS Top Header with Light/Dark Mode Switcher */}
-        <div className="h-9 flex items-center justify-between pb-1 app-drag">
-          {/* Light / Dark Mode Toggle Switch (Replaces the 3 corner dots) */}
+        {/* macOS Top Header with Traffic Lights (Extreme Upper-Left) & Tools */}
+        <div className="h-8 flex items-center justify-between pb-1 app-drag">
+          {/* macOS Traffic Light Buttons */}
           <div
-            className={`flex items-center p-0.5 rounded-full border transition-all app-no-drag shadow-xs backdrop-blur-md ${
-              isWhitish
-                ? 'bg-black/5 border-black/10'
-                : 'bg-white/10 border-white/15'
-            }`}
+            className="flex items-center gap-2 app-no-drag group cursor-default"
+            role="group"
+            aria-label="macOS Window Controls"
           >
+            {/* Red: Close Window */}
             <button
               type="button"
-              onClick={() => setGlassTheme('whitish')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
-                isWhitish
-                  ? 'bg-white text-slate-900 shadow-xs font-semibold'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-              title="Switch to Light Glass Mode"
-              aria-label="Light Mode"
+              onClick={closeWindow}
+              className="w-3 h-3 rounded-full bg-[#ff5f56] border border-[#e0443e] hover:brightness-90 active:brightness-75 flex items-center justify-center transition-all cursor-pointer shadow-xs focus:outline-none"
+              title="Close window"
+              aria-label="Close"
             >
-              <Sun className={`w-3 h-3 ${isWhitish ? 'text-amber-500 fill-amber-500/20' : 'text-slate-400'}`} />
-              <span>Light</span>
+              <svg
+                className="w-2 h-2 text-[#4d0000] opacity-0 group-hover:opacity-100 transition-opacity"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             </button>
+
+            {/* Yellow: Minimize Window */}
             <button
               type="button"
-              onClick={() => setGlassTheme('blackish')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
-                !isWhitish
-                  ? 'bg-neutral-800 text-white shadow-xs font-semibold border border-white/20'
-                  : 'text-slate-500 hover:text-slate-900'
-              }`}
-              title="Switch to Dark Glass Mode"
-              aria-label="Dark Mode"
+              onClick={minimizeWindow}
+              className="w-3 h-3 rounded-full bg-[#ffbd2e] border border-[#dea123] hover:brightness-90 active:brightness-75 flex items-center justify-center transition-all cursor-pointer shadow-xs focus:outline-none"
+              title="Minimize window"
+              aria-label="Minimize"
             >
-              <Moon className={`w-3 h-3 ${!isWhitish ? 'text-cyan-400 fill-cyan-400/20' : 'text-slate-500'}`} />
-              <span>Dark</span>
+              <svg
+                className="w-2 h-2 text-[#593b00] opacity-0 group-hover:opacity-100 transition-opacity"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+              >
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+            </button>
+
+            {/* Green: Toggle Maximize / Zoom */}
+            <button
+              type="button"
+              onClick={toggleMaximizeWindow}
+              className="w-3 h-3 rounded-full bg-[#27c93f] border border-[#1aab29] hover:brightness-90 active:brightness-75 flex items-center justify-center transition-all cursor-pointer shadow-xs focus:outline-none"
+              title="Zoom / Toggle Fullscreen"
+              aria-label="Toggle Fullscreen"
+            >
+              <svg
+                className="w-1.5 h-1.5 text-[#004d11] opacity-0 group-hover:opacity-100 transition-opacity"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M5 19h4v-2H6.41l4.3-4.29-1.42-1.42L5 15.59V19zm10-14h-4v2h2.59l-4.3 4.29 1.42 1.42L15 8.41V12h2V5h-2z" />
+              </svg>
             </button>
           </div>
 
-          <button
-            onClick={onOpenTeam}
-            className={`app-no-drag flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-[10px] font-mono transition-colors ${
-              isWhitish
-                ? 'bg-black/5 hover:bg-black/10 border-black/10 text-slate-700'
-                : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
-            }`}
-            title="Softablitz 2026 Team 220"
-          >
-            <span>Team 220</span>
-          </button>
+          {/* Right side tools: Quick Theme Switcher & Team Info */}
+          <div className="flex items-center gap-1.5 app-no-drag">
+            <button
+              type="button"
+              onClick={() => setGlassTheme(isWhitish ? 'blackish' : 'whitish')}
+              className={`p-1 rounded-full border transition-all ${
+                isWhitish
+                  ? 'bg-black/5 hover:bg-black/10 border-black/10 text-slate-700'
+                  : 'bg-white/10 hover:bg-white/15 border-white/15 text-slate-200'
+              }`}
+              title={isWhitish ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+              aria-label="Toggle Theme"
+            >
+              {isWhitish ? (
+                <Moon className="w-3 h-3 text-indigo-600" />
+              ) : (
+                <Sun className="w-3 h-3 text-amber-400 fill-amber-400/20" />
+              )}
+            </button>
+
+            <button
+              onClick={onOpenTeam}
+              className={`flex items-center px-2 py-0.5 rounded-md border text-[10px] font-mono transition-colors ${
+                isWhitish
+                  ? 'bg-black/5 hover:bg-black/10 border-black/10 text-slate-700'
+                  : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
+              }`}
+              title="Softablitz 2026 Team 220"
+            >
+              <span>Team 220</span>
+            </button>
+          </div>
         </div>
 
         {/* AuraDesk Brand Title */}

@@ -22,7 +22,77 @@ const OpenExternalSchema = z.object({
  * @param {Function} [onShutdown]
  */
 function registerAppHandlers(appSettings, getMainWindow, onShutdown) {
-  // 1. app:minimizeToTray
+  // 1. window:close
+  ipcMain.removeHandler('window:close');
+  ipcMain.handle('window:close', async () => {
+    try {
+      const win = typeof getMainWindow === 'function' ? getMainWindow() : getMainWindow;
+      if (win && !win.isDestroyed()) {
+        win.close();
+      }
+      return ipcSuccess({ ok: true });
+    } catch (err) {
+      return ipcError('INTERNAL_ERROR', err.message);
+    }
+  });
+
+  // 2. window:minimize
+  ipcMain.removeHandler('window:minimize');
+  ipcMain.handle('window:minimize', async () => {
+    try {
+      const win = typeof getMainWindow === 'function' ? getMainWindow() : getMainWindow;
+      if (win && !win.isDestroyed()) {
+        win.minimize();
+      }
+      return ipcSuccess({ ok: true });
+    } catch (err) {
+      return ipcError('INTERNAL_ERROR', err.message);
+    }
+  });
+
+  // 3. window:toggleMaximize
+  ipcMain.removeHandler('window:toggleMaximize');
+  ipcMain.handle('window:toggleMaximize', async () => {
+    try {
+      const win = typeof getMainWindow === 'function' ? getMainWindow() : getMainWindow;
+      if (win && !win.isDestroyed()) {
+        if (win.isFullScreen()) {
+          win.setFullScreen(false);
+        } else if (win.isMaximized()) {
+          win.unmaximize();
+        } else {
+          win.maximize();
+        }
+        return ipcSuccess({
+          isMaximized: win.isMaximized(),
+          isFullScreen: win.isFullScreen()
+        });
+      }
+      return ipcSuccess({ isMaximized: false, isFullScreen: false });
+    } catch (err) {
+      return ipcError('INTERNAL_ERROR', err.message);
+    }
+  });
+
+  // 4. window:isMaximized
+  ipcMain.removeHandler('window:isMaximized');
+  ipcMain.handle('window:isMaximized', async () => {
+    try {
+      const win = typeof getMainWindow === 'function' ? getMainWindow() : getMainWindow;
+      if (win && !win.isDestroyed()) {
+        return ipcSuccess({
+          isMaximized: win.isMaximized(),
+          isFullScreen: win.isFullScreen()
+        });
+      }
+      return ipcSuccess({ isMaximized: false, isFullScreen: false });
+    } catch (err) {
+      return ipcError('INTERNAL_ERROR', err.message);
+    }
+  });
+
+  // 5. app:minimizeToTray
+  ipcMain.removeHandler('app:minimizeToTray');
   ipcMain.handle('app:minimizeToTray', async () => {
     try {
       const win = typeof getMainWindow === 'function' ? getMainWindow() : getMainWindow;

@@ -637,6 +637,74 @@ export const electronBridge = {
     }
   },
 
+  // ==========================================
+  // NATIVE WINDOW CONTROLS (macOS TRAFFIC LIGHTS)
+  // ==========================================
+
+  /**
+   * Closes the Electron application window (hides to tray per app lifecycle)
+   */
+  async closeWindow(): Promise<void> {
+    if (!isElectron()) return;
+    try {
+      if (window.api?.window?.close) {
+        await window.api.window.close();
+      } else {
+        await window.api!.invoke('window:close');
+      }
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to close window:', err);
+    }
+  },
+
+  /**
+   * Minimizes the Electron application window to system dock
+   */
+  async minimizeWindow(): Promise<void> {
+    if (!isElectron()) return;
+    try {
+      if (window.api?.window?.minimize) {
+        await window.api.window.minimize();
+      } else {
+        await window.api!.invoke('window:minimize');
+      }
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to minimize window:', err);
+    }
+  },
+
+  /**
+   * Toggles window zoom / maximize or full screen
+   */
+  async toggleMaximizeWindow(): Promise<{ isMaximized: boolean; isFullScreen: boolean } | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = window.api?.window?.toggleMaximize
+        ? await window.api.window.toggleMaximize()
+        : await window.api!.invoke('window:toggleMaximize');
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to toggle maximize window:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Checks whether the application window is currently maximized or fullscreen
+   */
+  async isWindowMaximized(): Promise<{ isMaximized: boolean; isFullScreen: boolean } | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = window.api?.window?.isMaximized
+        ? await window.api.window.isMaximized()
+        : await window.api!.invoke('window:isMaximized');
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to check window state:', err);
+      return null;
+    }
+  },
+
   /**
    * Hides the application window to system tray
    */

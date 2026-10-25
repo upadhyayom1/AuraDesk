@@ -108,11 +108,15 @@ interface IPCResponse<T = any> {
 
 ---
 
-### 2.7 Settings & App Lifecycle
+### 2.7 Settings, App Lifecycle & Window Controls
 | Channel | Service | Payload | Return Data (`data`) | Description |
 | :--- | :--- | :--- | :--- | :--- |
 | `settings:get` | Settings | `void` | `AppSettings` | Reads application settings from SQLite. |
 | `settings:set` | Settings | `{ patch: Partial<AppSettings> }` | `AppSettings` | Validates and updates changed keys. |
+| `window:close` | App | `void` | `{ ok: boolean }` | Closes application window (intercepted to hide to tray unless quitting). |
+| `window:minimize` | App | `void` | `{ ok: boolean }` | Minimizes application window to dock. |
+| `window:toggleMaximize` | App | `void` | `{ isMaximized: boolean, isFullScreen: boolean }` | Toggles window maximize/zoom or fullscreen. |
+| `window:isMaximized` | App | `void` | `{ isMaximized: boolean, isFullScreen: boolean }` | Checks if window is currently maximized or fullscreen. |
 | `app:minimizeToTray` | App | `void` | `{ ok: boolean }` | Hides application window; background scheduler remains active. |
 | `app:setAutoLaunch` | App | `{ enabled: boolean }` | `{ ok: boolean }` | Configures `app.setLoginItemSettings()` for startup persistence. |
 | `app:openExternal` | App | `{ url: string }` | `{ ok: boolean }` | Opens URL in system browser (strictly requires `https://`). |

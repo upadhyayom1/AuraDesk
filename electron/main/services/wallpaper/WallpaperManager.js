@@ -146,16 +146,18 @@ class WallpaperManager {
    * @returns {Promise<Buffer>}
    */
   async getImageBuffer(wp) {
-    if (wp.source === 'local') {
-      const localPath = wp.localPath || wp.imageUrl.replace(/^file:\/\//, '');
+    const url = wp.imageUrl || wp.thumbUrl || '';
+    const isRemote = url.startsWith('http://') || url.startsWith('https://');
+
+    if (wp.source === 'local' && !isRemote) {
+      const localPath = wp.localPath || url.replace(/^file:\/\//, '');
       if (!fs.existsSync(localPath)) {
         throw new Error(`Local file not found on disk: ${localPath}`);
       }
       return fs.promises.readFile(localPath);
     }
 
-    // Online image (Unsplash / Pexels)
-    const url = wp.imageUrl || wp.thumbUrl;
+    // Online image (Unsplash / Pexels / remote HTTP)
     if (!url) {
       throw new Error(`Wallpaper ${wp.id} has no valid image URL`);
     }

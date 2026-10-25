@@ -67,6 +67,10 @@ const ALLOWED_INVOKE_CHANNELS = new Set([
   // Settings & Window
   'settings:get',
   'settings:set',
+  'window:close',
+  'window:minimize',
+  'window:toggleMaximize',
+  'window:isMaximized',
   'app:minimizeToTray',
   'app:setAutoLaunch',
   'app:openExternal',
@@ -113,6 +117,14 @@ contextBridge.exposeInMainWorld('api', {
     const subscription = (_event, ...args) => callback(...args);
     ipcRenderer.on(channel, subscription);
     return () => ipcRenderer.removeListener(channel, subscription);
+  },
+
+  // Explicit, typed window controls
+  window: {
+    close: () => ipcRenderer.invoke('window:close'),
+    minimize: () => ipcRenderer.invoke('window:minimize'),
+    toggleMaximize: () => ipcRenderer.invoke('window:toggleMaximize'),
+    isMaximized: () => ipcRenderer.invoke('window:isMaximized')
   },
 
   // Explicit, typed discovery helpers

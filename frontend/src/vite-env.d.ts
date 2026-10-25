@@ -4,6 +4,12 @@ interface Window {
   api?: {
     invoke: (channel: string, payload?: any) => Promise<any>;
     on: (channel: string, callback: (...args: any[]) => void) => () => void;
+    window?: {
+      close: () => Promise<any>;
+      minimize: () => Promise<any>;
+      toggleMaximize: () => Promise<any>;
+      isMaximized: () => Promise<any>;
+    };
     discovery?: {
       search: (params: any) => Promise<any>;
       browse: (params?: any) => Promise<any>;

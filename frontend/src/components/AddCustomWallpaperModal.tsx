@@ -35,7 +35,7 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!imageUrl || !title) return;
 
@@ -44,7 +44,7 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
       .map(t => t.trim().toLowerCase())
       .filter(Boolean);
 
-    const created = addCustomWallpaper({
+    const created = await addCustomWallpaper({
       title: title.trim(),
       imageUrl: imageUrl.trim(),
       category,
@@ -55,7 +55,7 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
       tags,
     });
 
-    applyWallpaper(created, 'manual');
+    await applyWallpaper(created, 'manual');
     onClose();
   };
 

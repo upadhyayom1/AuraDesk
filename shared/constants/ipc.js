@@ -65,6 +65,10 @@ export const IPC_CHANNELS = {
   // Settings & Window
   SETTINGS_GET: 'settings:get',
   SETTINGS_SET: 'settings:set',
+  WINDOW_CLOSE: 'window:close',
+  WINDOW_MINIMIZE: 'window:minimize',
+  WINDOW_TOGGLE_MAXIMIZE: 'window:toggleMaximize',
+  WINDOW_IS_MAXIMIZED: 'window:isMaximized',
   APP_MINIMIZE_TO_TRAY: 'app:minimizeToTray',
   APP_SET_AUTO_LAUNCH: 'app:setAutoLaunch',
   APP_OPEN_EXTERNAL: 'app:openExternal',

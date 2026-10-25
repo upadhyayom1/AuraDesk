@@ -420,8 +420,8 @@ class PersonalizationEngine {
 
     if (!fallbackWp) {
       fallbackWp = {
-        id: 'local:default-fallback',
-        source: 'local',
+        id: 'unsplash:default-fallback',
+        source: 'unsplash',
         title: 'AuraDesk Default Wallpaper',
         imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',
         thumbUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb',

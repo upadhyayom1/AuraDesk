@@ -194,7 +194,7 @@ class WallpaperApplication {
       vibrancy: 'under-window',
       visualEffectState: 'active',
       webPreferences: {
-        preload: path.join(__dirname, '../../preload/index.js'),
+        preload: path.join(__dirname, '../../../preload/index.js'),
         contextIsolation: true,
         nodeIntegration: false,
         sandbox: true
@@ -212,10 +212,10 @@ class WallpaperApplication {
     const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
     if (isDev) {
       this.mainWindow.loadURL('http://localhost:5173').catch(() => {
-        this.mainWindow.loadFile(path.join(__dirname, '../../../frontend/dist/index.html'));
+        this.mainWindow.loadFile(path.join(__dirname, '../../../../frontend/dist/index.html'));
       });
     } else {
-      this.mainWindow.loadFile(path.join(__dirname, '../../../frontend/dist/index.html'));
+      this.mainWindow.loadFile(path.join(__dirname, '../../../../frontend/dist/index.html'));
     }
 
     // Intercept close button: Hide to tray instead of closing unless quitting

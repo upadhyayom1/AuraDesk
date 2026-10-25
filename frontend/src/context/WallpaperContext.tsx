@@ -10,11 +10,7 @@ import {
   WeatherCondition,
   TimeOfDay,
 } from '../types/wallpaper';
-import {
-  CURATED_WALLPAPERS,
-  DEFAULT_COLLECTIONS,
-} from '../data/curatedWallpapers';
-import { electronBridge, isElectron } from '../services/electronBridge';
+import { electronBridge, isElectron, normalizeBackendWallpaper } from '../services/electronBridge';
 
 interface WallpaperContextType {
   wallpapers: Wallpaper[];
@@ -30,26 +26,32 @@ interface WallpaperContextType {
   settings: AppSettings;
   schedulerRunning: boolean;
   secondsRemaining: number;
-  applyWallpaper: (wallpaper: Wallpaper, reason?: HistoryEntry['reason']) => void;
-  rotateNext: (isManual?: boolean) => void;
-  rollbackHistory: (entryId: string) => void;
-  clearHistory: () => void;
-  createCollection: (name: string, description?: string) => WallpaperCollection;
-  deleteCollection: (id: string) => void;
-  toggleWallpaperInCollection: (wallpaperId: string, collectionId: string) => void;
+  isLoadingBackend: boolean;
+  applyWallpaper: (wallpaper: Wallpaper, reason?: HistoryEntry['reason']) => Promise<boolean>;
+  rotateNext: (isManual?: boolean) => Promise<void>;
+  rollbackHistory: (entryId: string) => Promise<void>;
+  clearHistory: () => Promise<boolean>;
+  createCollection: (name: string, description?: string) => Promise<WallpaperCollection | null>;
+  deleteCollection: (id: string) => Promise<boolean>;
+  toggleWallpaperInCollection: (wallpaperId: string, collectionId: string, wallpaperObj?: Wallpaper) => Promise<boolean>;
   applyCollection: (collectionId: string, mode?: 'random' | 'next') => Promise<any>;
   exportCollection: (collectionId: string) => Promise<any>;
-  addCustomWallpaper: (wallpaper: Omit<Wallpaper, 'id'>) => Wallpaper;
+  addCustomWallpaper: (wallpaper: Omit<Wallpaper, 'id'>) => Promise<Wallpaper>;
   toggleScheduler: () => void;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
+  refreshCollections: () => Promise<void>;
+  refreshHistory: () => Promise<void>;
   isTrayOpen: boolean;
   setIsTrayOpen: (open: boolean) => void;
   isNativeElectron: boolean;
   pickNativeLocalWallpapers: () => Promise<Array<{ id: string; localPath: string; title: string; imageUrl: string }> | null>;
   minimizeAppToTray: () => void;
   quitApplication: () => void;
+  closeWindow: () => void;
+  minimizeWindow: () => void;
+  toggleMaximizeWindow: () => void;
   currentTimeString: string;
-  // Backward compatibility stubs for UI components
+  // Stubs for backward compatibility
   rules: PersonalizationRule[];
   calendarEvents: CalendarEvent[];
   weatherCondition: WeatherCondition;
@@ -69,15 +71,6 @@ interface WallpaperContextType {
 
 const WallpaperContext = createContext<WallpaperContextType | undefined>(undefined);
 
-const STORAGE_KEYS = {
-  WALLPAPERS: 'auradesk_wallpapers_v1',
-  COLLECTIONS: 'auradesk_collections_v1',
-  ACTIVE_COLLECTION: 'auradesk_active_col_v1',
-  CURRENT_WALLPAPER: 'auradesk_current_wp_v1',
-  SETTINGS: 'auradesk_settings_v1',
-  HISTORY: 'auradesk_history_v1',
-};
-
 const DEFAULT_SETTINGS: AppSettings = {
   rotationIntervalMinutes: 15,
   shuffleEnabled: true,
@@ -90,70 +83,32 @@ const DEFAULT_SETTINGS: AppSettings = {
   systemTrayMinimized: false,
 };
 
+const INITIAL_WALLPAPER: Wallpaper = {
+  id: 'auradesk-initial',
+  title: 'AuraDesk Engine',
+  imageUrl: '',
+  sourceCredit: 'AuraDesk Desktop Engine',
+  category: 'nature',
+  width: 3840,
+  height: 2160,
+  aspectRatio: '16:9',
+  tags: ['ready'],
+};
+
 export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // 1. Wallpapers Repository
-  const [wallpapers, setWallpapers] = useState<Wallpaper[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.WALLPAPERS);
-      return saved ? JSON.parse(saved) : CURATED_WALLPAPERS;
-    } catch {
-      return CURATED_WALLPAPERS;
-    }
-  });
-
-  // 2. Collections (Sanctum of Memories)
-  const [collections, setCollections] = useState<WallpaperCollection[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.COLLECTIONS);
-      return saved ? JSON.parse(saved) : DEFAULT_COLLECTIONS;
-    } catch {
-      return DEFAULT_COLLECTIONS;
-    }
-  });
-
-  const [activeCollectionId, setActiveCollectionId] = useState<string>(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEYS.ACTIVE_COLLECTION) || 'col-curated';
-    } catch {
-      return 'col-curated';
-    }
-  });
-
-  // 3. Current Wallpaper
-  const [currentWallpaper, setCurrentWallpaper] = useState<Wallpaper>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.CURRENT_WALLPAPER);
-      return saved ? JSON.parse(saved) : CURATED_WALLPAPERS[0];
-    } catch {
-      return CURATED_WALLPAPERS[0];
-    }
-  });
-
-  // 4. History (Time Stone)
-  const [history, setHistory] = useState<HistoryEntry[]>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.HISTORY);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  // 5. Settings
-  const [settings, setSettings] = useState<AppSettings>(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
-    } catch {
-      return DEFAULT_SETTINGS;
-    }
-  });
-
-  const [scalingMode, setScalingModeState] = useState<ScalingMode>(settings.scalingMode || 'fill');
-  const [glassTheme, setGlassThemeState] = useState<'whitish' | 'blackish'>(settings.glassTheme || 'whitish');
+  // 1. Authoritative Backend States (strictly zero hardcoded mocks)
+  const [wallpapers, setWallpapers] = useState<Wallpaper[]>([]);
+  const [collections, setCollections] = useState<WallpaperCollection[]>([]);
+  const [activeCollectionId, setActiveCollectionId] = useState<string>('');
+  const [currentWallpaper, setCurrentWallpaper] = useState<Wallpaper>(INITIAL_WALLPAPER);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
+  const [scalingMode, setScalingModeState] = useState<ScalingMode>('fill');
+  const [glassTheme, setGlassThemeState] = useState<'whitish' | 'blackish'>('whitish');
   const [schedulerRunning, setSchedulerRunning] = useState<boolean>(true);
-  const [secondsRemaining, setSecondsRemaining] = useState<number>(settings.rotationIntervalMinutes * 60);
+  const [secondsRemaining, setSecondsRemaining] = useState<number>(15 * 60);
   const [isTrayOpen, setIsTrayOpen] = useState<boolean>(false);
+  const [isLoadingBackend, setIsLoadingBackend] = useState<boolean>(true);
 
   // Time display
   const [liveDate, setLiveDate] = useState(new Date());
@@ -168,67 +123,31 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     return `${hours}:${minutes}`;
   }, [liveDate]);
 
-  // Sync state to LocalStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEYS.WALLPAPERS, JSON.stringify(wallpapers));
-      localStorage.setItem(STORAGE_KEYS.COLLECTIONS, JSON.stringify(collections));
-      localStorage.setItem(STORAGE_KEYS.ACTIVE_COLLECTION, activeCollectionId);
-      localStorage.setItem(STORAGE_KEYS.CURRENT_WALLPAPER, JSON.stringify(currentWallpaper));
-      localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(history));
-      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
-    } catch (e) {
-      console.warn('LocalStorage save failed:', e);
-    }
-  }, [wallpapers, collections, activeCollectionId, currentWallpaper, history, settings]);
+  // ==========================================
+  // AUTHORITATIVE BACKEND REFRESH METHODS
+  // ==========================================
 
-  // ==========================================
-  // BACKEND INTEGRATION & INITIALIZATION
-  // ==========================================
-  useEffect(() => {
+  // Refreshes Collections from SQLite
+  const refreshCollections = useCallback(async () => {
     if (!isElectron()) return;
-
-    let isMounted = true;
-
-    // A. Sync current wallpaper from SQLite / OS
-    electronBridge.getCurrentWallpaper().then((backendCurrent) => {
-      if (isMounted && backendCurrent && backendCurrent.imageUrl) {
-        setCurrentWallpaper(prev => ({
-          ...prev,
-          id: backendCurrent.id || prev.id,
-          title: backendCurrent.title || prev.title,
-          imageUrl: backendCurrent.imageUrl,
-          sourceCredit: backendCurrent.creditUrl || backendCurrent.photographer || prev.sourceCredit,
-        }));
+    try {
+      const summaries = await electronBridge.listCollections();
+      if (!summaries || !Array.isArray(summaries)) {
+        setCollections([]);
+        return;
       }
-    }).catch(console.warn);
-
-    // B. Load collections from SQLite
-    electronBridge.listCollections().then(async (summaries) => {
-      if (!isMounted || !summaries || summaries.length === 0) return;
 
       const loadedCollections: WallpaperCollection[] = [];
-      const loadedWallpapers: Wallpaper[] = [];
+      const allCollectionWallpapers: Wallpaper[] = [];
 
       for (const s of summaries) {
         const detail = await electronBridge.getCollection(s.id);
         const itemIds: string[] = [];
 
-        if (detail && detail.items) {
+        if (detail && Array.isArray(detail.items)) {
           for (const it of detail.items) {
             itemIds.push(it.id);
-            loadedWallpapers.push({
-              id: it.id,
-              title: it.title || 'Collection Wallpaper',
-              imageUrl: it.imageUrl || it.thumbUrl,
-              sourceCredit: it.creditUrl || it.photographer || 'AuraDesk',
-              category: 'nature',
-              width: it.width || 3840,
-              height: it.height || 2160,
-              aspectRatio: '16:9',
-              tags: ['collection'],
-              isCustom: it.source === 'local',
-            });
+            allCollectionWallpapers.push(normalizeBackendWallpaper(it));
           }
         }
 
@@ -241,26 +160,34 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         });
       }
 
-      if (isMounted) {
-        if (loadedCollections.length > 0) {
-          setCollections(loadedCollections);
-          if (!loadedCollections.some(c => c.id === activeCollectionId)) {
-            setActiveCollectionId(loadedCollections[0].id);
-          }
-        }
-        if (loadedWallpapers.length > 0) {
-          setWallpapers(prev => {
-            const existingIds = new Set(prev.map(p => p.id));
-            const fresh = loadedWallpapers.filter(w => !existingIds.has(w.id));
-            return fresh.length > 0 ? [...prev, ...fresh] : prev;
-          });
-        }
+      setCollections(loadedCollections);
+      if (allCollectionWallpapers.length > 0) {
+        setWallpapers(prev => {
+          const map = new Map(prev.map(p => [p.id, p]));
+          allCollectionWallpapers.forEach(w => map.set(w.id, w));
+          return Array.from(map.values());
+        });
       }
-    }).catch(console.warn);
 
-    // C. Load rotation history from SQLite
-    electronBridge.getRotationHistory(30, 0).then((entries) => {
-      if (isMounted && entries && entries.length > 0) {
+      if (loadedCollections.length > 0) {
+        setActiveCollectionId(prev => {
+          if (prev && loadedCollections.some(c => c.id === prev)) return prev;
+          return loadedCollections[0].id;
+        });
+      } else {
+        setActiveCollectionId('');
+      }
+    } catch (err) {
+      console.warn('[WallpaperContext] Failed to refresh collections from SQLite:', err);
+    }
+  }, []);
+
+  // Refreshes Rotation History from SQLite
+  const refreshHistory = useCallback(async () => {
+    if (!isElectron()) return;
+    try {
+      const entries = await electronBridge.getRotationHistory(50, 0);
+      if (entries && Array.isArray(entries)) {
         const mapped: HistoryEntry[] = entries.map(e => ({
           id: String(e.id),
           wallpaperId: e.wallpaperId,
@@ -271,55 +198,85 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           reason: (e.trigger?.toLowerCase() === 'rotation' ? 'scheduler' : 'manual') as any,
         })).filter(h => Boolean(h.imageUrl));
 
-        if (mapped.length > 0) {
-          setHistory(mapped);
+        setHistory(mapped);
+      } else {
+        setHistory([]);
+      }
+    } catch (err) {
+      console.warn('[WallpaperContext] Failed to refresh history from SQLite:', err);
+    }
+  }, []);
+
+  // ==========================================
+  // INITIALIZATION & REAL-TIME EVENT SUBSCRIPTION
+  // ==========================================
+  useEffect(() => {
+    if (!isElectron()) {
+      setIsLoadingBackend(false);
+      return;
+    }
+
+    let isMounted = true;
+    setIsLoadingBackend(true);
+
+    const initBackend = async () => {
+      try {
+        // 1. Current wallpaper from OS / SQLite
+        const backendCurrent = await electronBridge.getCurrentWallpaper();
+        if (isMounted && backendCurrent && backendCurrent.imageUrl) {
+          setCurrentWallpaper(normalizeBackendWallpaper(backendCurrent));
+        }
+
+        // 2. Collections from SQLite
+        await refreshCollections();
+
+        // 3. History from SQLite
+        await refreshHistory();
+
+        // 4. Rotation config from backend scheduler
+        const config = await electronBridge.getRotationConfig();
+        if (isMounted && config) {
+          setSchedulerRunning(config.enabled);
+          setSettings(prev => ({
+            ...prev,
+            rotationIntervalMinutes: config.intervalMinutes,
+            shuffleEnabled: config.shuffle,
+          }));
+          setSecondsRemaining(config.intervalMinutes * 60);
+        }
+
+        // 5. Settings from SQLite
+        const savedSettings = await electronBridge.getSettings();
+        if (isMounted && savedSettings) {
+          setSettings(prev => ({
+            ...prev,
+            ...savedSettings,
+            rotationIntervalMinutes: savedSettings.rotationInterval ?? prev.rotationIntervalMinutes,
+            shuffleEnabled: savedSettings.shuffleEnabled ?? prev.shuffleEnabled,
+            autoAdaptEnabled: savedSettings.autoAdaptEnabled ?? prev.autoAdaptEnabled,
+          }));
+        }
+      } catch (err) {
+        console.warn('[WallpaperContext] Error during backend initialization:', err);
+      } finally {
+        if (isMounted) {
+          setIsLoadingBackend(false);
         }
       }
-    }).catch(console.warn);
+    };
 
-    // D. Load rotation config from backend
-    electronBridge.getRotationConfig().then((config) => {
-      if (isMounted && config) {
-        setSchedulerRunning(config.enabled);
-        setSettings(prev => ({
-          ...prev,
-          rotationIntervalMinutes: config.intervalMinutes,
-          shuffleEnabled: config.shuffle,
-        }));
-      }
-    }).catch(console.warn);
+    initBackend();
 
-    // E. Subscribe to push events from Electron
+    // Push Event: Desktop Wallpaper Changed (from rotation, tray, or manual apply)
     const unsubWallpaper = electronBridge.onWallpaperChanged((eventData) => {
       if (eventData && eventData.wallpaper) {
-        const wp = eventData.wallpaper;
-        const newWp: Wallpaper = {
-          id: wp.id,
-          title: wp.title || 'Desktop Wallpaper',
-          imageUrl: wp.imageUrl || wp.thumbUrl,
-          sourceCredit: wp.creditUrl || wp.photographer || 'AuraDesk Engine',
-          category: 'nature',
-          width: wp.width || 3840,
-          height: wp.height || 2160,
-          aspectRatio: '16:9',
-          tags: ['active'],
-        };
-        setCurrentWallpaper(newWp);
-        setHistory(prev => [
-          {
-            id: 'hist-' + Date.now(),
-            wallpaperId: newWp.id,
-            wallpaperTitle: newWp.title,
-            imageUrl: newWp.imageUrl,
-            sourceCredit: newWp.sourceCredit,
-            appliedAt: eventData.appliedAt || new Date().toISOString(),
-            reason: eventData.trigger?.toLowerCase() === 'rotation' ? 'scheduler' : 'manual',
-          },
-          ...prev.slice(0, 49),
-        ]);
+        const wp = normalizeBackendWallpaper(eventData.wallpaper);
+        setCurrentWallpaper(wp);
+        refreshHistory();
       }
     });
 
+    // Push Event: Rotation State Changed
     const unsubRotation = electronBridge.onRotationState((state) => {
       if (state && typeof state.enabled === 'boolean') {
         setSchedulerRunning(state.enabled);
@@ -331,228 +288,202 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       if (typeof unsubWallpaper === 'function') unsubWallpaper();
       if (typeof unsubRotation === 'function') unsubRotation();
     };
-  }, []);
+  }, [refreshCollections, refreshHistory]);
 
   // ==========================================
-  // ACTION HANDLERS
+  // BACKEND-DRIVEN MUTATION ACTIONS
   // ==========================================
 
-  // Apply Wallpaper to desktop & record history
-  const applyWallpaper = useCallback((wallpaper: Wallpaper, reason: HistoryEntry['reason'] = 'manual') => {
-    setCurrentWallpaper(wallpaper);
+  // Apply Wallpaper to host OS and persist to SQLite
+  const applyWallpaper = useCallback(async (wallpaper: Wallpaper, reason: HistoryEntry['reason'] = 'manual'): Promise<boolean> => {
+    if (!isElectron()) return false;
 
-    const newEntry: HistoryEntry = {
-      id: 'hist-' + Date.now(),
-      wallpaperId: wallpaper.id,
-      wallpaperTitle: wallpaper.title,
-      imageUrl: wallpaper.imageUrl,
-      sourceCredit: wallpaper.sourceCredit,
-      appliedAt: new Date().toISOString(),
-      reason,
-    };
+    const trigger = reason === 'scheduler' ? 'ROTATION' : 'MANUAL';
+    const res = await electronBridge.applyWallpaper(wallpaper, trigger, activeCollectionId);
 
-    setHistory(prev => [newEntry, ...prev.filter(e => e.wallpaperId !== wallpaper.id)].slice(0, 50));
-
-    if (isElectron()) {
-      const trigger = reason === 'scheduler' ? 'ROTATION' : 'MANUAL';
-      electronBridge.applyWallpaper(wallpaper, trigger, activeCollectionId).catch(console.warn);
+    if (res.success) {
+      setCurrentWallpaper(wallpaper);
+      await refreshHistory();
+      return true;
+    } else {
+      console.warn('[WallpaperContext] Wallpaper application failed:', res.error);
+      return false;
     }
-  }, [activeCollectionId]);
+  }, [activeCollectionId, refreshHistory]);
 
-  // Rotate next wallpaper
-  const rotateNext = useCallback((isManual = true) => {
+  // Rotate next wallpaper in active collection via backend scheduler
+  const rotateNext = useCallback(async (isManual = true): Promise<void> => {
     if (isElectron()) {
-      electronBridge.rotateNow().then((backendWp) => {
-        if (backendWp) {
-          const wp: Wallpaper = {
-            id: backendWp.id,
-            title: backendWp.title || 'Rotated Wallpaper',
-            imageUrl: backendWp.imageUrl || backendWp.thumbUrl,
-            sourceCredit: backendWp.creditUrl || backendWp.photographer || 'AuraDesk Engine',
-            category: 'nature',
-            width: backendWp.width || 3840,
-            height: backendWp.height || 2160,
-            aspectRatio: '16:9',
-            tags: ['rotated'],
-          };
-          setCurrentWallpaper(wp);
-        }
-      }).catch(console.warn);
-      return;
+      const backendWp = await electronBridge.rotateNow();
+      if (backendWp) {
+        setCurrentWallpaper(normalizeBackendWallpaper(backendWp));
+        await refreshHistory();
+      }
     }
+  }, [refreshHistory]);
 
-    // Fallback rotation
-    const pool = wallpapers;
-    if (pool.length === 0) return;
-    const currentIndex = pool.findIndex(w => w.id === currentWallpaper.id);
-    const nextIndex = (currentIndex + 1) % pool.length;
-    applyWallpaper(pool[nextIndex], isManual ? 'manual' : 'scheduler');
-  }, [wallpapers, currentWallpaper.id, applyWallpaper]);
-
-  // Rollback to history item
-  const rollbackHistory = useCallback((entryId: string) => {
+  // Rollback to prior history item
+  const rollbackHistory = useCallback(async (entryId: string): Promise<void> => {
     const entry = history.find(h => h.id === entryId);
     if (!entry) return;
-    const wp = wallpapers.find(w => w.id === entry.wallpaperId) || {
+
+    const target: Wallpaper = {
       id: entry.wallpaperId,
       title: entry.wallpaperTitle,
       imageUrl: entry.imageUrl,
+      thumbUrl: entry.imageUrl,
       sourceCredit: entry.sourceCredit,
-      category: 'nature' as const,
+      category: 'nature',
       width: 3840,
       height: 2160,
       aspectRatio: '16:9',
       tags: ['rollback'],
     };
-    applyWallpaper(wp, 'manual');
-  }, [history, wallpapers, applyWallpaper]);
 
-  // Clear history
-  const clearHistory = useCallback(() => {
-    setHistory([]);
+    await applyWallpaper(target, 'manual');
+  }, [history, applyWallpaper]);
+
+  // Clear rotation history in SQLite
+  const clearHistory = useCallback(async (): Promise<boolean> => {
     if (isElectron()) {
-      electronBridge.clearRotationHistory().catch(console.warn);
-    }
-  }, []);
-
-  // Create Collection
-  const createCollection = useCallback((name: string, description: string = '') => {
-    const tempId = 'col-' + Date.now();
-    const created: WallpaperCollection = {
-      id: tempId,
-      name,
-      description: description || 'Custom Collection',
-      createdAt: new Date().toISOString(),
-      wallpaperIds: [],
-    };
-
-    setCollections(prev => [...prev, created]);
-    setActiveCollectionId(tempId);
-
-    if (isElectron()) {
-      electronBridge.createCollection(name).then((backendCol) => {
-        if (backendCol && backendCol.id) {
-          setCollections(prev => prev.map(c => c.id === tempId ? { ...c, id: backendCol.id } : c));
-          setActiveCollectionId(backendCol.id);
-        }
-      }).catch(console.warn);
-    }
-
-    return created;
-  }, []);
-
-  // Delete Collection
-  const deleteCollection = useCallback((id: string) => {
-    setCollections(prev => {
-      const remaining = prev.filter(c => c.id !== id);
-      if (activeCollectionId === id && remaining.length > 0) {
-        setActiveCollectionId(remaining[0].id);
+      const success = await electronBridge.clearRotationHistory();
+      if (success) {
+        setHistory([]);
+        return true;
       }
-      return remaining;
-    });
-
-    if (isElectron()) {
-      electronBridge.deleteCollection(id).catch(console.warn);
     }
-  }, [activeCollectionId]);
+    return false;
+  }, []);
 
-  // Toggle Wallpaper in Collection
-  const toggleWallpaperInCollection = useCallback((wallpaperId: string, collectionId: string) => {
-    const wpObj = wallpapers.find(w => w.id === wallpaperId);
+  // Create Collection in SQLite
+  const createCollection = useCallback(async (name: string, description: string = ''): Promise<WallpaperCollection | null> => {
+    if (!isElectron()) return null;
 
-    setCollections(prev =>
-      prev.map(col => {
-        if (col.id === collectionId) {
-          const exists = col.wallpaperIds.includes(wallpaperId);
-          const nextIds = exists
-            ? col.wallpaperIds.filter(id => id !== wallpaperId)
-            : [...col.wallpaperIds, wallpaperId];
+    const created = await electronBridge.createCollection(name);
+    if (created && created.id) {
+      await refreshCollections();
+      setActiveCollectionId(created.id);
+      return {
+        id: created.id,
+        name: created.name,
+        description: description || 'Custom Collection',
+        createdAt: created.createdAt,
+        wallpaperIds: [],
+      };
+    }
+    return null;
+  }, [refreshCollections]);
 
-          if (isElectron() && wpObj) {
-            if (exists) {
-              electronBridge.removeCollectionItem(collectionId, wallpaperId).catch(console.warn);
-            } else {
-              electronBridge.addCollectionItem(collectionId, wpObj).catch(console.warn);
-            }
-          }
+  // Delete Collection in SQLite
+  const deleteCollection = useCallback(async (id: string): Promise<boolean> => {
+    if (!isElectron()) return false;
 
-          return { ...col, wallpaperIds: nextIds };
-        }
-        return col;
-      })
-    );
-  }, [wallpapers]);
+    const success = await electronBridge.deleteCollection(id);
+    if (success) {
+      await refreshCollections();
+      return true;
+    }
+    return false;
+  }, [refreshCollections]);
 
-  // Apply Collection (Cycle or Shuffle)
+  // Toggle/Add/Remove wallpaper in a collection in SQLite
+  const toggleWallpaperInCollection = useCallback(async (
+    wallpaperId: string,
+    collectionId: string,
+    wallpaperObj?: Wallpaper
+  ): Promise<boolean> => {
+    if (!isElectron()) return false;
+
+    const col = collections.find(c => c.id === collectionId);
+    const exists = col?.wallpaperIds.includes(wallpaperId);
+
+    if (exists) {
+      await electronBridge.removeCollectionItem(collectionId, wallpaperId);
+    } else {
+      const wpToSave = wallpaperObj || wallpapers.find(w => w.id === wallpaperId) || {
+        id: wallpaperId,
+        title: 'Wallpaper',
+        imageUrl: '',
+        thumbUrl: '',
+        sourceCredit: 'AuraDesk',
+        category: 'nature' as const,
+        width: 3840,
+        height: 2160,
+        aspectRatio: '16:9',
+        tags: [],
+      };
+      await electronBridge.addCollectionItem(collectionId, wpToSave);
+    }
+
+    await refreshCollections();
+    return true;
+  }, [collections, wallpapers, refreshCollections]);
+
+  // Apply an entire collection to the desktop (shuffle or cycle)
   const applyCollection = useCallback(async (collectionId: string, mode: 'random' | 'next' = 'next') => {
     if (isElectron()) {
       const res = await electronBridge.applyCollection(collectionId, mode);
       if (res) {
-        const wp: Wallpaper = {
-          id: res.id,
-          title: res.title || 'Collection Wallpaper',
-          imageUrl: res.imageUrl || res.thumbUrl,
-          sourceCredit: res.creditUrl || res.photographer || 'AuraDesk',
-          category: 'nature',
-          width: res.width || 3840,
-          height: res.height || 2160,
-          aspectRatio: '16:9',
-          tags: ['collection'],
-        };
+        const wp = normalizeBackendWallpaper(res);
         setCurrentWallpaper(wp);
+        await refreshHistory();
         return res;
       }
     }
+    return null;
+  }, [refreshHistory]);
 
-    // Fallback
-    const col = collections.find(c => c.id === collectionId);
-    if (col && col.wallpaperIds.length > 0) {
-      const targetWp = wallpapers.find(w => w.id === col.wallpaperIds[0]);
-      if (targetWp) applyWallpaper(targetWp, 'scheduler');
-    }
-  }, [collections, wallpapers, applyWallpaper]);
-
-  // Export Collection to JSON
+  // Export collection to JSON vault
   const exportCollection = useCallback(async (collectionId: string) => {
     return electronBridge.exportCollection(collectionId);
   }, []);
 
-  // Add Custom Wallpaper
-  const addCustomWallpaper = useCallback((newWall: Omit<Wallpaper, 'id'>) => {
+  // Add Custom Wallpaper (saves to SQLite and applies)
+  const addCustomWallpaper = useCallback(async (newWall: Omit<Wallpaper, 'id'>): Promise<Wallpaper> => {
     const created: Wallpaper = {
       ...newWall,
-      id: 'custom-' + Date.now(),
+      id: `local:${Date.now()}`,
       isCustom: true,
     };
-    setWallpapers(prev => [created, ...prev]);
-    toggleWallpaperInCollection(created.id, activeCollectionId);
+
+    if (activeCollectionId) {
+      await electronBridge.addCollectionItem(activeCollectionId, created);
+      await refreshCollections();
+    }
+
+    await applyWallpaper(created, 'manual');
     return created;
-  }, [activeCollectionId, toggleWallpaperInCollection]);
+  }, [activeCollectionId, refreshCollections, applyWallpaper]);
 
   // Native Local Wallpaper Picker
   const pickNativeLocalWallpapers = useCallback(async () => {
     const picked = await electronBridge.pickLocalWallpapers();
     if (picked && picked.length > 0) {
-      const added: Wallpaper[] = picked.map(p => ({
-        id: p.id,
-        title: p.title || 'Local Wallpaper',
-        imageUrl: p.imageUrl,
-        category: 'minimalist' as const,
-        sourceCredit: 'Local Disk: ' + p.localPath,
+      const first = picked[0];
+      const wp: Wallpaper = {
+        id: first.id,
+        title: first.title || 'Local Wallpaper',
+        imageUrl: first.imageUrl,
+        thumbUrl: first.imageUrl,
+        category: 'minimalist',
+        sourceCredit: 'Local Disk: ' + first.localPath,
         width: 3840,
         height: 2160,
         aspectRatio: '16:9',
         tags: ['local', 'custom'],
         isCustom: true,
-      }));
-      setWallpapers(prev => [...added, ...prev]);
-      if (added[0]) {
-        applyWallpaper(added[0], 'manual');
+      };
+
+      if (activeCollectionId) {
+        await electronBridge.addCollectionItem(activeCollectionId, wp);
+        await refreshCollections();
       }
+
+      await applyWallpaper(wp, 'manual');
       return picked;
     }
     return null;
-  }, [applyWallpaper]);
+  }, [activeCollectionId, refreshCollections, applyWallpaper]);
 
   // Scheduler Toggle
   const toggleScheduler = useCallback(() => {
@@ -596,6 +527,7 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     updateSettings({ scalingMode: mode });
   }, [updateSettings]);
 
+  // Window Controls
   const minimizeAppToTray = useCallback(() => {
     electronBridge.minimizeToTray();
   }, []);
@@ -604,7 +536,19 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     electronBridge.quitApp();
   }, []);
 
-  // Timer countdown
+  const closeWindow = useCallback(() => {
+    electronBridge.closeWindow();
+  }, []);
+
+  const minimizeWindow = useCallback(() => {
+    electronBridge.minimizeWindow();
+  }, []);
+
+  const toggleMaximizeWindow = useCallback(() => {
+    electronBridge.toggleMaximizeWindow();
+  }, []);
+
+  // Timer countdown for rotation
   useEffect(() => {
     if (!schedulerRunning) return;
     const interval = setInterval(() => {
@@ -634,6 +578,7 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         settings,
         schedulerRunning,
         secondsRemaining,
+        isLoadingBackend,
         applyWallpaper,
         rotateNext,
         rollbackHistory,
@@ -646,14 +591,19 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         addCustomWallpaper,
         toggleScheduler,
         updateSettings,
+        refreshCollections,
+        refreshHistory,
         isTrayOpen,
         setIsTrayOpen,
         isNativeElectron: isElectron(),
         pickNativeLocalWallpapers,
         minimizeAppToTray,
         quitApplication,
+        closeWindow,
+        minimizeWindow,
+        toggleMaximizeWindow,
         currentTimeString,
-        // Backward compatibility stubs for UI components
+        // Stubs for backward compatibility
         rules: [],
         calendarEvents: [],
         weatherCondition: 'clear',

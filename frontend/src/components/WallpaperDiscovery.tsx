@@ -15,10 +15,8 @@ import {
   Loader2,
   Globe,
   Image as ImageIcon,
-  Layers,
 } from 'lucide-react';
 import { Wallpaper, WallpaperCategory } from '../types/wallpaper';
-import { CURATED_WALLPAPERS } from '../data/curatedWallpapers';
 import {
   electronBridge,
   DiscoverySourceStatus,
@@ -41,7 +39,7 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
 
   const isWhitish = glassTheme === 'whitish';
 
-  // State
+  // Live Discovery State
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedSource, setSelectedSource] = useState<'all' | 'unsplash' | 'pexels'>('all');
@@ -55,7 +53,6 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [errorCode, setErrorCode] = useState<string | null>(null);
-  const [isCuratedFallbackMode, setIsCuratedFallbackMode] = useState<boolean>(false);
   const [sourcesStatus, setSourcesStatus] = useState<DiscoverySourceStatus[]>([]);
   const [selectedWallpaperForDetails, setSelectedWallpaperForDetails] = useState<Wallpaper | null>(null);
   const [collectionPickerOpenForWallId, setCollectionPickerOpenForWallId] = useState<string | null>(null);
@@ -120,7 +117,7 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
           });
         }
 
-        // Drop stale responses if a newer search was initiated
+        // Drop stale responses if a newer query was fired
         if (currentRequestId !== requestIdRef.current) return;
 
         if (result.success && result.data) {
@@ -133,7 +130,6 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
           setPage(result.data.page);
           setTotalPages(result.data.totalPages);
           setTotalCount(result.data.total);
-          setIsCuratedFallbackMode(false);
           setError(null);
           setErrorCode(null);
         } else {
@@ -160,11 +156,9 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
 
   // Trigger search/browse when debounced query or filters change
   useEffect(() => {
-    if (!isCuratedFallbackMode) {
-      setPage(1);
-      fetchWallpapers(1, false);
-    }
-  }, [debouncedQuery, selectedSource, selectedOrientation, isCuratedFallbackMode, fetchWallpapers]);
+    setPage(1);
+    fetchWallpapers(1, false);
+  }, [debouncedQuery, selectedSource, selectedOrientation, fetchWallpapers]);
 
   // Handle Category click (sets query or resets to browse)
   const handleCategorySelect = (cat: typeof categories[0]) => {
@@ -176,26 +170,6 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
     }
   };
 
-  // Switch explicitly to Curated Fallback
-  const handleActivateCuratedFallback = () => {
-    setIsCuratedFallbackMode(true);
-    setOnlineWallpapers(CURATED_WALLPAPERS);
-    setTotalCount(CURATED_WALLPAPERS.length);
-    setTotalPages(1);
-    setPage(1);
-    setError(null);
-    setErrorCode(null);
-    setIsLoading(false);
-  };
-
-  // Switch back to Online Discovery
-  const handleRetryOnline = () => {
-    setIsCuratedFallbackMode(false);
-    setPage(1);
-    fetchWallpapers(1, false);
-  };
-
-  // Active wallpapers pool
   const displayedWallpapers = onlineWallpapers;
 
   return (
@@ -216,7 +190,7 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search Unsplash & Pexels (e.g. nature, architecture, cyberpunk)..."
+            placeholder="Search online wallpapers from Unsplash & Pexels (e.g. nature, architecture, cyberpunk)..."
             className={`w-full pl-9 pr-8 py-2 rounded-xl backdrop-blur-xl border text-xs placeholder-slate-400 focus:outline-none transition-all ${
               isWhitish
                 ? 'bg-white/70 border-white/80 text-slate-900 focus:bg-white focus:border-cyan-600 focus:ring-1 focus:ring-cyan-500/20'
@@ -226,7 +200,7 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white"
+              className="absolute right-2.5 top-2.5 text-slate-400 hover:text-white cursor-pointer"
               title="Clear search"
             >
               <X className="w-3.5 h-3.5" />
@@ -278,7 +252,7 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
           {/* Add Custom Wallpaper */}
           <button
             onClick={onOpenAddCustom}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/30 text-xs font-medium transition-all shadow-sm active:scale-95 whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/30 text-xs font-medium transition-all shadow-sm active:scale-95 whitespace-nowrap cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Custom</span>
@@ -294,7 +268,7 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
             <button
               key={cat.id}
               onClick={() => handleCategorySelect(cat)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
                 isSelected
                   ? isWhitish
                     ? 'bg-white text-slate-900 shadow-xs border border-white/90'
@@ -313,27 +287,10 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
       {/* Sources Status & Mode Indicator Banner */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs px-1">
         <div className="flex items-center gap-2">
-          {isCuratedFallbackMode ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/30 text-[11px] font-medium">
-              <Layers className="w-3 h-3" />
-              <span>Offline Curated Gallery Mode</span>
-            </span>
-          ) : (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30 text-[11px] font-medium">
-              <Globe className="w-3 h-3" />
-              <span>Live Discovery (Unsplash & Pexels)</span>
-            </span>
-          )}
-
-          {isCuratedFallbackMode && (
-            <button
-              onClick={handleRetryOnline}
-              className="text-[11px] text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 font-medium"
-            >
-              <RefreshCw className="w-3 h-3" />
-              <span>Switch to Live Search</span>
-            </button>
-          )}
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30 text-[11px] font-medium">
+            <Globe className="w-3 h-3" />
+            <span>Live Discovery (Unsplash & Pexels)</span>
+          </span>
         </div>
 
         <div className={`text-[11px] font-mono flex items-center gap-3 ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
@@ -364,8 +321,8 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
         </div>
       </div>
 
-      {/* Error State Banner with Explicit Retry and Curated Gallery Fallback */}
-      {error && !isCuratedFallbackMode && (
+      {/* Error State Banner with Accurate Error Code and Retry */}
+      {error && (
         <div
           className={`p-4 rounded-2xl border transition-all ${
             isWhitish
@@ -376,17 +333,22 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
             <div className="flex-1 space-y-1">
-              <h4 className="text-sm font-semibold">Online Wallpaper Discovery Unavailable</h4>
+              <h4 className="text-sm font-semibold">Online Discovery Error</h4>
               <p className="text-xs text-rose-400 leading-relaxed">
                 {error}
                 {errorCode === 'AUTH_REQUIRED' && (
                   <span className="block mt-1 text-[11px] opacity-90">
-                    Add <code>UNSPLASH_ACCESS_KEY</code> or <code>PEXELS_API_KEY</code> to your <code>.env</code> file in the application root directory.
+                    Please ensure valid <code>UNSPLASH_ACCESS_KEY</code> or <code>PEXELS_API_KEY</code> is configured in <code>.env</code>.
                   </span>
                 )}
                 {errorCode === 'RATE_LIMITED' && (
                   <span className="block mt-1 text-[11px] opacity-90">
-                    Provider request limit reached. Failover to Pexels was attempted.
+                    Rate limit reached on external providers. Please wait a moment before trying again.
+                  </span>
+                )}
+                {errorCode === 'OFFLINE' && (
+                  <span className="block mt-1 text-[11px] opacity-90">
+                    Check your internet connection and verify external DNS resolution.
                   </span>
                 )}
               </p>
@@ -396,14 +358,7 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
                   className="px-3.5 py-1.5 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 border border-rose-400/40 text-xs font-medium flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Retry Connection</span>
-                </button>
-                <button
-                  onClick={handleActivateCuratedFallback}
-                  className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 text-xs font-medium flex items-center gap-1.5 transition-all active:scale-95 cursor-pointer"
-                >
-                  <Layers className="w-3.5 h-3.5 text-amber-300" />
-                  <span>Browse Offline Curated Gallery</span>
+                  <span>Retry Search</span>
                 </button>
               </div>
             </div>
@@ -434,9 +389,9 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
       {!isLoading && displayedWallpapers.length === 0 ? (
         <div className="p-12 text-center rounded-2xl mac-glass-panel-dark border border-white/10 space-y-3">
           <ImageIcon className="w-10 h-10 text-slate-500 mx-auto" />
-          <p className="text-sm font-semibold text-white">No wallpapers matched your search</p>
+          <p className="text-sm font-semibold text-white">No wallpapers found</p>
           <p className="text-xs text-slate-400 max-w-sm mx-auto">
-            Try adjusting your query, changing providers, or exploring the offline curated library.
+            {searchQuery ? `No online wallpapers matched "${searchQuery}".` : 'No wallpapers available in this feed.'} Try a different search term or change your orientation and source filters.
           </p>
           <div className="flex items-center justify-center gap-3 pt-2">
             <button
@@ -449,12 +404,6 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
               className="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/20 text-white text-xs font-medium transition-all border border-white/20 cursor-pointer"
             >
               Reset Filters
-            </button>
-            <button
-              onClick={handleActivateCuratedFallback}
-              className="px-4 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/30 text-xs font-medium transition-all cursor-pointer"
-            >
-              Browse Curated Wallpapers
             </button>
           </div>
         </div>
@@ -569,27 +518,33 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
                           <p className={`text-[10px] font-mono px-2 py-0.5 uppercase ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
                             Add to Collection
                           </p>
-                          {collections.map(col => {
-                            const inCol = col.wallpaperIds.includes(wall.id);
-                            return (
-                              <button
-                                key={col.id}
-                                onClick={() => toggleWallpaperInCollection(wall.id, col.id)}
-                                className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors cursor-pointer ${
-                                  inCol
-                                    ? isWhitish
-                                      ? 'bg-blue-500/15 text-blue-900 font-semibold'
-                                      : 'bg-cyan-500/20 text-cyan-200'
-                                    : isWhitish
-                                    ? 'text-slate-700 hover:bg-black/5'
-                                    : 'text-slate-300 hover:bg-white/10 hover:text-white'
-                                }`}
-                              >
-                                <span className="truncate">{col.name}</span>
-                                {inCol && <Check className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400" />}
-                              </button>
-                            );
-                          })}
+                          {collections.length === 0 ? (
+                            <p className="text-[11px] text-slate-400 px-2 py-1 italic">
+                              No collections created yet.
+                            </p>
+                          ) : (
+                            collections.map(col => {
+                              const inCol = col.wallpaperIds.includes(wall.id);
+                              return (
+                                <button
+                                  key={col.id}
+                                  onClick={() => toggleWallpaperInCollection(wall.id, col.id, wall)}
+                                  className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-left transition-colors cursor-pointer ${
+                                    inCol
+                                      ? isWhitish
+                                        ? 'bg-blue-500/15 text-blue-900 font-semibold'
+                                        : 'bg-cyan-500/20 text-cyan-200'
+                                      : isWhitish
+                                      ? 'text-slate-700 hover:bg-black/5'
+                                      : 'text-slate-300 hover:bg-white/10 hover:text-white'
+                                  }`}
+                                >
+                                  <span className="truncate">{col.name}</span>
+                                  {inCol && <Check className="w-3.5 h-3.5 text-blue-600 dark:text-cyan-400" />}
+                                </button>
+                              );
+                            })
+                          )}
                         </div>
                       )}
                     </div>
@@ -617,7 +572,7 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
       )}
 
       {/* Pagination / Load More */}
-      {!isLoading && !isCuratedFallbackMode && displayedWallpapers.length > 0 && page < totalPages && (
+      {!isLoading && displayedWallpapers.length > 0 && page < totalPages && (
         <div className="pt-4 flex justify-center">
           <button
             onClick={() => fetchWallpapers(page + 1, true)}

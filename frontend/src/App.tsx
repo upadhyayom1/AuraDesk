@@ -8,7 +8,7 @@ import { HistoryTrayView } from './components/HistoryTrayView';
 import { SettingsModal } from './components/SettingsModal';
 import { TeamInfoModal } from './components/TeamInfoModal';
 import { AddCustomWallpaperModal } from './components/AddCustomWallpaperModal';
-import { Sun, Moon, Minus, X } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 
 const AuraDeskApp: React.FC = () => {
   const {
@@ -17,8 +17,6 @@ const AuraDeskApp: React.FC = () => {
     setIsTrayOpen,
     glassTheme,
     setGlassTheme,
-    minimizeAppToTray,
-    quitApplication,
     isNativeElectron,
   } = useWallpaper();
 
@@ -118,34 +116,6 @@ const AuraDeskApp: React.FC = () => {
             }`}>
               AuraDesk · Softablitz 2026 Team 220
             </span>
-
-            {/* Electron Window Actions if running as native desktop app */}
-            {isNativeElectron && (
-              <div className={`flex items-center gap-1 pl-2 border-l ${isWhitish ? 'border-slate-300' : 'border-white/15'}`}>
-                <button
-                  type="button"
-                  onClick={minimizeAppToTray}
-                  className={`p-1.5 rounded-md transition-colors ${
-                    isWhitish ? 'hover:bg-black/5 text-slate-600' : 'hover:bg-white/10 text-slate-400'
-                  }`}
-                  title="Minimize to Tray"
-                  aria-label="Minimize"
-                >
-                  <Minus className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={quitApplication}
-                  className={`p-1.5 rounded-md transition-colors ${
-                    isWhitish ? 'hover:bg-rose-500/10 hover:text-rose-600 text-slate-600' : 'hover:bg-rose-500/20 hover:text-rose-400 text-slate-400'
-                  }`}
-                  title="Quit AuraDesk"
-                  aria-label="Quit"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            )}
           </div>
         </header>
 
