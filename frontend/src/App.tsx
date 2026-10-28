@@ -71,7 +71,10 @@ const AuraDeskApp: React.FC = () => {
             }`}
         >
           <div className="flex items-center gap-2 app-no-drag">
-            <span className={`font-semibold capitalize text-sm tracking-wide ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
+            <span
+              key={activeTab}
+              className={`mac-view-transition font-semibold capitalize text-sm tracking-wide ${isWhitish ? 'text-slate-900' : 'text-white'}`}
+            >
               {activeTab === 'discovery' && 'Explore 5K & 4K Wallpapers'}
               {activeTab === 'collections' && 'Collection Manager & Playlists'}
               {activeTab === 'rotation' && 'Automatic Wallpaper Rotation'}
@@ -109,27 +112,29 @@ const AuraDeskApp: React.FC = () => {
 
         {/* Scrollable Main Content Surface */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6">
-          {activeTab === 'discovery' && (
-            <WallpaperDiscovery
-              onOpenAddCustom={() => setIsAddCustomOpen(true)}
-              onOpenCollections={() => setActiveTab('collections')}
-            />
-          )}
-          {activeTab === 'collections' && (
-            <CollectionsView onOpenAddCustom={() => setIsAddCustomOpen(true)} />
-          )}
-          {activeTab === 'rotation' && (
-            <RotationView
-              onOpenCollections={() => setActiveTab('collections')}
-              onOpenHistory={() => setActiveTab('history')}
-            />
-          )}
-          {activeTab === 'personalization' && (
-            <PersonalizationView
-              onOpenCollections={() => setActiveTab('collections')}
-            />
-          )}
-          {activeTab === 'history' && <HistoryTrayView />}
+          <div key={activeTab} className="mac-view-transition min-h-full">
+            {activeTab === 'discovery' && (
+              <WallpaperDiscovery
+                onOpenAddCustom={() => setIsAddCustomOpen(true)}
+                onOpenCollections={() => setActiveTab('collections')}
+              />
+            )}
+            {activeTab === 'collections' && (
+              <CollectionsView onOpenAddCustom={() => setIsAddCustomOpen(true)} />
+            )}
+            {activeTab === 'rotation' && (
+              <RotationView
+                onOpenCollections={() => setActiveTab('collections')}
+                onOpenHistory={() => setActiveTab('history')}
+              />
+            )}
+            {activeTab === 'personalization' && (
+              <PersonalizationView
+                onOpenCollections={() => setActiveTab('collections')}
+              />
+            )}
+            {activeTab === 'history' && <HistoryTrayView />}
+          </div>
         </div>
       </div>
 

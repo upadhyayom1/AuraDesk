@@ -193,21 +193,30 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
-                className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium transition-all group ${isActive
+                className={`relative w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium transition-all duration-200 ease-out group cursor-pointer active:scale-[0.98] ${isActive
                   ? isWhitish
-                    ? 'bg-white/90 text-slate-900 shadow-sm border border-white/80'
-                    : 'bg-white/15 text-white shadow-sm border border-white/20'
+                    ? 'bg-white/95 text-slate-900 shadow-sm border border-slate-200/80 font-semibold'
+                    : 'bg-white/15 text-white shadow-sm border border-white/20 font-semibold'
                   : isWhitish
-                    ? 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                    ? 'text-slate-600 hover:text-slate-900 hover:bg-white/60 border border-transparent'
+                    : 'text-slate-300 hover:text-white hover:bg-white/8 border border-transparent'
                   }`}
               >
-                <div className="flex items-center gap-2.5">
-                  <Icon
-                    className={`w-4 h-4 transition-colors ${isActive
+                {/* Smooth macOS Active Indicator Pill */}
+                <span
+                  className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full transition-all duration-200 ease-out ${isActive
                       ? isWhitish
-                        ? 'text-indigo-600'
-                        : 'text-cyan-300'
+                        ? 'bg-indigo-600 opacity-100 scale-y-100'
+                        : 'bg-cyan-400 opacity-100 scale-y-100'
+                      : 'opacity-0 scale-y-0'
+                    }`}
+                />
+                <div className="flex items-center gap-2.5 pl-1">
+                  <Icon
+                    className={`w-4 h-4 transition-all duration-200 ease-out ${isActive
+                      ? isWhitish
+                        ? 'text-indigo-600 scale-105'
+                        : 'text-cyan-300 scale-105'
                       : isWhitish
                         ? 'text-slate-500 group-hover:text-slate-800'
                         : 'text-slate-400 group-hover:text-slate-200'
@@ -216,7 +225,7 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
                   <span>{item.label}</span>
                 </div>
                 {item.count !== undefined && (
-                  <span className={`text-[11px] font-mono tabular-nums ${isWhitish ? 'text-slate-400' : 'text-slate-400'}`}>
+                  <span className={`text-[11px] font-mono tabular-nums transition-colors duration-200 ${isActive ? (isWhitish ? 'text-slate-700 font-semibold' : 'text-white/80 font-semibold') : 'text-slate-400'}`}>
                     {item.count}
                   </span>
                 )}
@@ -236,11 +245,10 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
             <button
               type="button"
               onClick={() => onSelectTab('collections')}
-              className={`text-[10px] uppercase font-mono tracking-wider font-semibold transition-colors flex items-center gap-1 cursor-pointer ${
-                isWhitish
+              className={`text-[10px] uppercase font-mono tracking-wider font-semibold transition-colors flex items-center gap-1 cursor-pointer ${isWhitish
                   ? 'text-slate-500 hover:text-slate-900'
                   : 'text-slate-400 hover:text-white'
-              }`}
+                }`}
               title="Go to Collections Manager"
             >
               <span>Collections</span>
@@ -271,22 +279,28 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
                     setActiveCollectionId(col.id);
                     onSelectTab('collections');
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all text-left cursor-pointer ${
-                    isSelected
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${isSelected
                       ? isWhitish
-                        ? 'bg-white text-slate-900 font-semibold shadow-xs border border-slate-200'
+                        ? 'bg-white/95 text-slate-900 font-semibold shadow-xs border border-slate-200/80'
                         : 'bg-white/15 text-white font-semibold border border-white/20'
                       : isWhitish
-                      ? 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
-                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                        ? 'text-slate-600 hover:text-slate-900 hover:bg-white/40 border border-transparent'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
                     }`}
                   title={`Open ${col.name} in Collections Manager`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? (isWhitish ? 'bg-slate-900' : 'bg-white') : 'bg-slate-400'}`} />
+                    <span
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-200 ${isSelected
+                          ? isWhitish
+                            ? 'bg-indigo-600 scale-125'
+                            : 'bg-cyan-400 scale-125'
+                          : 'bg-slate-400 scale-100'
+                        }`}
+                    />
                     <span className="truncate">{col.name}</span>
                   </div>
-                  <span className="text-[10px] font-mono opacity-60">
+                  <span className="text-[10px] font-mono opacity-60 tabular-nums">
                     {col.wallpaperIds.length}
                   </span>
                 </button>
