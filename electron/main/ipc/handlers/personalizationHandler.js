@@ -1,5 +1,5 @@
 /**
- * Personalization IPC Handlers (Eye of Agamotto)
+ * Personalization IPC Handlers (Context-Aware Personalization)
  * Registers channels for rules, overrides, context state, and mock controls.
  * Channels:
  * - personalization:getState

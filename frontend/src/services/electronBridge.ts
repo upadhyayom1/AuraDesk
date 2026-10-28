@@ -882,6 +882,45 @@ export const electronBridge = {
   },
 
   /**
+   * Testing & Development: Sets mock context for personalization evaluation
+   */
+  async setMockContext(mock: { weather?: string; tempC?: number; isDay?: boolean; dayPart?: string; activeEvent?: any } | null): Promise<boolean> {
+    if (!isElectron()) return false;
+    try {
+      const res = await window.api!.invoke('personalization:setMockContext', mock);
+      return res?.ok === true;
+    } catch {
+      return false;
+    }
+  },
+
+  /**
+   * Testing & Development: Gets active mock context if any
+   */
+  async getMockContext(): Promise<any | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('personalization:getMockContext');
+      return res?.ok ? res.data?.mockContext : null;
+    } catch {
+      return null;
+    }
+  },
+
+  /**
+   * Testing & Development: Clears mock context
+   */
+  async clearMockContext(): Promise<boolean> {
+    if (!isElectron()) return false;
+    try {
+      const res = await window.api!.invoke('personalization:clearMockContext');
+      return res?.ok === true;
+    } catch {
+      return false;
+    }
+  },
+
+  /**
    * Sets manual wallpaper override
    */
   async setOverride(wallpaperId: string, durationMinutes = 120): Promise<any | null> {

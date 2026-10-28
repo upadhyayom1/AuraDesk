@@ -1,5 +1,5 @@
 /**
- * CollectionsService (Sanctum of Memories)
+ * CollectionsService
  * Manages named wallpaper vaults, reordering, collection apply (shuffle/cycle),
  * and bonus export/import functionality.
  */

@@ -516,18 +516,28 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
             }`}
           >
             <div className="flex items-center justify-between text-xs opacity-75 mb-2">
-              <span className="font-mono uppercase text-[10px]">Live Weather</span>
+              <span className="font-mono uppercase text-[10px]">
+                {contextSnapshot?.weather?.isFallback ? 'Weather (Unconfigured)' : 'Live Weather'}
+              </span>
               <CloudSun className="w-4 h-4 text-indigo-400" />
             </div>
             <div className="space-y-0.5">
-              <div className="text-xl font-bold font-mono tracking-tight flex items-baseline gap-1">
-                <span>{contextSnapshot?.weather?.tempC !== undefined ? `${Math.round(contextSnapshot.weather.tempC)}°C` : '22°C'}</span>
-                <span className="text-xs font-normal opacity-75 font-sans">
-                  {contextSnapshot?.weather?.condition || 'Clear'}
-                </span>
-              </div>
+              {contextSnapshot?.weather && !contextSnapshot.weather.isFallback && contextSnapshot.weather.tempC !== undefined ? (
+                <div className="text-xl font-bold font-mono tracking-tight flex items-baseline gap-1">
+                  <span>{Math.round(contextSnapshot.weather.tempC)}°C</span>
+                  <span className="text-xs font-normal opacity-75 font-sans">
+                    {contextSnapshot.weather.condition}
+                  </span>
+                </div>
+              ) : (
+                <div className="text-sm font-semibold opacity-80">
+                  <span>No live weather data</span>
+                </div>
+              )}
               <p className={`text-[11px] truncate ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
-                {settings.location?.city || 'Default Location'}
+                {settings.location?.city && !contextSnapshot?.weather?.isFallback
+                  ? settings.location.city
+                  : 'Configure city in Settings'}
               </p>
             </div>
           </div>
@@ -585,7 +595,7 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
         </div>
       </div>
 
-      {/* Diagnostic Evaluation Result Panel (after clicking "Test My Rules") */}
+      {/* Rule Evaluation Result Panel (after clicking "Test My Rules") */}
       {evalResult && (
         <div
           className={`p-4 rounded-2xl border animate-fade-in ${
@@ -597,7 +607,7 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-cyan-500" />
-              <span className="text-xs font-bold uppercase tracking-wider">Evaluation Diagnostic Result</span>
+              <span className="text-xs font-bold uppercase tracking-wider">Rule Evaluation Result</span>
             </div>
             <button
               onClick={() => setEvalResult(null)}

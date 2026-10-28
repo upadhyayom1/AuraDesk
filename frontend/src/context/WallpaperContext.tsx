@@ -10,7 +10,7 @@ import {
   WeatherCondition,
   TimeOfDay,
 } from '../types/wallpaper';
-import { electronBridge, isElectron, normalizeBackendWallpaper } from '../services/electronBridge';
+import { electronBridge, isElectron, getPlatform, normalizeBackendWallpaper } from '../services/electronBridge';
 
 interface WallpaperContextType {
   wallpapers: Wallpaper[];
@@ -45,6 +45,9 @@ interface WallpaperContextType {
   isTrayOpen: boolean;
   setIsTrayOpen: (open: boolean) => void;
   isNativeElectron: boolean;
+  backendStatus: 'initializing' | 'ready' | 'offline' | 'error' | 'disconnected';
+  backendError: string | null;
+  platformName: string;
   pickNativeLocalWallpapers: () => Promise<Array<{ id: string; localPath: string; title: string; imageUrl: string }> | null>;
   minimizeAppToTray: () => void;
   quitApplication: () => void;
@@ -110,6 +113,15 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [secondsRemaining, setSecondsRemaining] = useState<number>(15 * 60);
   const [isTrayOpen, setIsTrayOpen] = useState<boolean>(false);
   const [isLoadingBackend, setIsLoadingBackend] = useState<boolean>(true);
+  const [backendStatus, setBackendStatus] = useState<'initializing' | 'ready' | 'offline' | 'error' | 'disconnected'>(
+    isElectron() ? 'initializing' : 'disconnected'
+  );
+  const [backendError, setBackendError] = useState<string | null>(null);
+
+  const platformName = useMemo(() => {
+    const p = getPlatform();
+    return p === 'darwin' ? 'macOS' : (p === 'win32' ? 'Windows' : 'Linux');
+  }, []);
 
   // Time display
   const [liveDate, setLiveDate] = useState(new Date());
@@ -222,6 +234,9 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     const initBackend = async () => {
       try {
+        setBackendStatus('initializing');
+        setBackendError(null);
+
         // 1. Current wallpaper from OS / SQLite
         const backendCurrent = await electronBridge.getCurrentWallpaper();
         if (isMounted && backendCurrent && backendCurrent.imageUrl) {
@@ -261,8 +276,16 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
             autoAdaptEnabled: savedSettings.autoAdaptEnabled ?? prev.autoAdaptEnabled,
           }));
         }
-      } catch (err) {
+
+        if (isMounted) {
+          setBackendStatus('ready');
+        }
+      } catch (err: any) {
         console.warn('[WallpaperContext] Error during backend initialization:', err);
+        if (isMounted) {
+          setBackendStatus('error');
+          setBackendError(err?.message || 'Backend connection error');
+        }
       } finally {
         if (isMounted) {
           setIsLoadingBackend(false);
@@ -635,6 +658,9 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isTrayOpen,
         setIsTrayOpen,
         isNativeElectron: isElectron(),
+        backendStatus,
+        backendError,
+        platformName,
         pickNativeLocalWallpapers,
         minimizeAppToTray,
         quitApplication,

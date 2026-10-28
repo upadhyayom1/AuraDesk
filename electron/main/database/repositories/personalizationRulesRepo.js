@@ -1,6 +1,6 @@
 /**
  * Personalization Rules Repository
- * Handles SQLite operations for the 'personalization_rules' table (Eye of Agamotto).
+ * Handles SQLite operations for the 'personalization_rules' table.
  */
 
 const crypto = require('crypto');

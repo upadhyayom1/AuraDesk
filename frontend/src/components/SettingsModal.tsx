@@ -30,13 +30,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   const [citySavedNotice, setCitySavedNotice] = useState(false);
 
   const intervalOptions = [
-    { label: '15 minutes (Recommended)', value: 15 },
+    { label: '1 minute', value: 1 },
+    { label: '15 minutes (Standard)', value: 15 },
     { label: '30 minutes', value: 30 },
     { label: '1 hour', value: 60 },
     { label: '6 hours', value: 360 },
     { label: '12 hours', value: 720 },
     { label: '24 hours', value: 1440 },
-    { label: '1 minute (Fast Demo)', value: 1 },
   ];
 
   const handleSaveCity = async () => {
@@ -125,7 +125,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           <div className={`p-3.5 rounded-2xl border space-y-2 ${isWhitish ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
             <label className={`font-semibold flex items-center gap-2 ${isWhitish ? 'text-slate-800' : 'text-slate-200'}`}>
               <Monitor className={`w-3.5 h-3.5 ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`} />
-              <span>Sharp Scaling & Cropping Engine</span>
+              <span>Wallpaper Scaling & Fitting</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
@@ -159,7 +159,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
             <div className="flex items-center justify-between">
               <label className={`font-semibold flex items-center gap-2 ${isWhitish ? 'text-slate-800' : 'text-slate-200'}`}>
                 <MapPin className={`w-3.5 h-3.5 ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`} />
-                <span>Weather Telemetry City</span>
+                <span>Weather Location</span>
               </label>
               {citySavedNotice && (
                 <span className="text-[10px] text-emerald-500 font-medium flex items-center gap-1">

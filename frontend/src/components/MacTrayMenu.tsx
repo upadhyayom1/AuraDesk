@@ -97,24 +97,32 @@ export const MacTrayMenu: React.FC<MacTrayMenuProps> = ({ onOpenAppWindow, onOpe
             onClick={() => {
               rotateNext(true);
             }}
-            className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-xs font-medium text-white transition-all shadow-sm active:scale-95"
+            className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-xs font-semibold transition-all shadow-xs active:scale-95 cursor-pointer ${
+              isWhitish
+                ? 'bg-white hover:bg-slate-100 text-slate-800 border-slate-200'
+                : 'bg-white/10 hover:bg-white/20 text-white border-white/10'
+            }`}
           >
-            <RotateCw className="w-3.5 h-3.5 text-cyan-300" />
+            <RotateCw className={`w-3.5 h-3.5 ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`} />
             <span>Next Wallpaper</span>
           </button>
 
           <button
             onClick={toggleScheduler}
-            className="flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-xs font-medium text-white transition-all shadow-sm active:scale-95"
+            className={`flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl border text-xs font-semibold transition-all shadow-xs active:scale-95 cursor-pointer ${
+              isWhitish
+                ? 'bg-white hover:bg-slate-100 text-slate-800 border-slate-200'
+                : 'bg-white/10 hover:bg-white/20 text-white border-white/10'
+            }`}
           >
             {schedulerRunning ? (
               <>
-                <Pause className="w-3.5 h-3.5 text-amber-300" />
+                <Pause className="w-3.5 h-3.5 text-amber-500" />
                 <span>Pause Auto</span>
               </>
             ) : (
               <>
-                <Play className="w-3.5 h-3.5 text-emerald-300" />
+                <Play className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
                 <span>Resume Auto</span>
               </>
             )}
@@ -122,46 +130,60 @@ export const MacTrayMenu: React.FC<MacTrayMenuProps> = ({ onOpenAppWindow, onOpe
         </div>
 
         {/* Active Context Status */}
-        <div className="px-2.5 py-2 rounded-xl bg-slate-950/40 border border-white/5 text-[11px] mb-2.5 space-y-1">
-          <div className="flex items-center justify-between text-slate-400">
+        <div className={`px-2.5 py-2 rounded-xl border text-[11px] mb-2.5 space-y-1 ${
+          isWhitish ? 'bg-slate-50 border-slate-200 text-slate-800' : 'bg-slate-950/40 border-white/5 text-slate-200'
+        }`}>
+          <div className={`flex items-center justify-between ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3 text-slate-400" />
+              <Clock className="w-3 h-3" />
               <span>Next Rotation:</span>
             </span>
-            <span className="font-mono tabular-nums text-white/90">
+            <span className={`font-mono tabular-nums font-semibold ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
               {schedulerRunning ? formatCountdown(secondsRemaining) : 'Paused'}
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-slate-400">
+          <div className={`flex items-center justify-between ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
             <span className="flex items-center gap-1">
-              <Layers className="w-3 h-3 text-slate-400" />
+              <Layers className="w-3 h-3" />
               <span>Active Collection:</span>
             </span>
-            <span className="text-white/90 font-medium truncate max-w-[130px]">
+            <span className={`font-semibold truncate max-w-[130px] ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
               {activeCollection?.name || 'Default'}
             </span>
           </div>
 
-          <div className="pt-1 border-t border-white/5 text-[10px] text-cyan-300/90 leading-tight">
+          <div className={`pt-1 border-t text-[10px] leading-tight font-mono ${
+            isWhitish ? 'border-slate-200 text-indigo-700 font-semibold' : 'border-white/5 text-cyan-300/90'
+          }`}>
             ⚡ {activeRuleStatus.description}
           </div>
         </div>
 
         {/* Scaling Mode Quick Select */}
         <div className="mb-2.5">
-          <div className="flex items-center justify-between text-[11px] text-slate-400 px-1 mb-1">
+          <div className={`flex items-center justify-between text-[11px] px-1 mb-1 ${
+            isWhitish ? 'text-slate-500' : 'text-slate-400'
+          }`}>
             <span>Desktop Scaling</span>
-            <span className="text-white font-mono capitalize">{scalingMode}</span>
+            <span className={`font-mono capitalize font-semibold ${
+              isWhitish ? 'text-slate-900' : 'text-white'
+            }`}>{scalingMode}</span>
           </div>
-          <div className="grid grid-cols-4 gap-1 p-0.5 bg-black/30 rounded-lg border border-white/5 text-[10px]">
+          <div className={`grid grid-cols-4 gap-1 p-0.5 rounded-lg border text-[10px] ${
+            isWhitish ? 'bg-slate-100 border-slate-200' : 'bg-black/30 border-white/5'
+          }`}>
             {(['fill', 'fit-blur', 'center', 'stretch'] as const).map(mode => (
               <button
                 key={mode}
                 onClick={() => setScalingMode(mode)}
-                className={`py-1 rounded font-medium capitalize transition-all ${
+                className={`py-1 rounded font-medium capitalize transition-all cursor-pointer ${
                   scalingMode === mode
-                    ? 'bg-white/20 text-white shadow-xs'
+                    ? isWhitish
+                      ? 'bg-white text-slate-900 font-bold shadow-xs border border-slate-200'
+                      : 'bg-white/20 text-white font-bold shadow-xs'
+                    : isWhitish
+                    ? 'text-slate-600 hover:text-slate-900'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -174,7 +196,9 @@ export const MacTrayMenu: React.FC<MacTrayMenuProps> = ({ onOpenAppWindow, onOpe
         {/* Recent Rollback Quick List */}
         {history.length > 1 && (
           <div className="mb-2.5">
-            <p className="text-[10px] text-slate-400 px-1 mb-1 uppercase tracking-wider font-mono">
+            <p className={`text-[10px] px-1 mb-1 uppercase tracking-wider font-mono ${
+              isWhitish ? 'text-slate-500 font-semibold' : 'text-slate-400'
+            }`}>
               Quick Rollback
             </p>
             <div className="space-y-1">
@@ -182,7 +206,11 @@ export const MacTrayMenu: React.FC<MacTrayMenuProps> = ({ onOpenAppWindow, onOpe
                 <button
                   key={h.id}
                   onClick={() => rollbackHistory(h.id)}
-                  className="w-full flex items-center justify-between p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-left transition-colors text-[11px] group"
+                  className={`w-full flex items-center justify-between p-1.5 rounded-lg text-left transition-colors text-[11px] group cursor-pointer border ${
+                    isWhitish
+                      ? 'bg-white hover:bg-slate-50 border-slate-200/80 text-slate-800'
+                      : 'bg-white/5 hover:bg-white/10 border-transparent text-slate-200'
+                  }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <img
@@ -190,11 +218,15 @@ export const MacTrayMenu: React.FC<MacTrayMenuProps> = ({ onOpenAppWindow, onOpe
                       alt={h.wallpaperTitle}
                       className="w-6 h-6 rounded object-cover shrink-0"
                     />
-                    <span className="truncate text-slate-300 group-hover:text-white">
+                    <span className={`truncate ${
+                      isWhitish ? 'text-slate-800 group-hover:text-slate-950 font-medium' : 'text-slate-300 group-hover:text-white'
+                    }`}>
                       {h.wallpaperTitle}
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-500 tabular-nums">
+                  <span className={`text-[10px] font-mono tabular-nums ${
+                    isWhitish ? 'text-slate-400' : 'text-slate-500'
+                  }`}>
                     {h.appliedAt}
                   </span>
                 </button>
@@ -204,13 +236,17 @@ export const MacTrayMenu: React.FC<MacTrayMenuProps> = ({ onOpenAppWindow, onOpe
         )}
 
         {/* Footer Actions */}
-        <div className="pt-2 border-t border-white/10 flex items-center justify-between">
+        <div className={`pt-2 border-t flex items-center justify-between ${
+          isWhitish ? 'border-slate-200' : 'border-white/10'
+        }`}>
           <button
             onClick={() => {
               setIsTrayOpen(false);
               onOpenSettings();
             }}
-            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors py-1 px-2 rounded-lg hover:bg-white/5"
+            className={`flex items-center gap-1.5 text-xs transition-colors py-1 px-2 rounded-lg cursor-pointer ${
+              isWhitish ? 'text-slate-600 hover:text-slate-900 hover:bg-black/5' : 'text-slate-400 hover:text-white hover:bg-white/5'
+            }`}
           >
             <Sliders className="w-3.5 h-3.5" />
             <span>Preferences...</span>

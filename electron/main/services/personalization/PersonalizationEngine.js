@@ -1,5 +1,5 @@
 /**
- * PersonalizationEngine (Eye of Agamotto)
+ * PersonalizationEngine
  * Evaluates contextual environmental state and user rules to select the active desktop wallpaper.
  *
  * Priority Evaluation Chain:
@@ -203,12 +203,14 @@ class PersonalizationEngine {
         condition: weather.condition,
         tempC: weather.tempC,
         isDay: weather.isDay,
-        dayPart: weather.dayPart
+        dayPart: weather.dayPart,
+        isFallback: Boolean(weather.isFallback)
       } : {
         condition: 'Clear',
         tempC: 22,
         isDay: defaultIsDay,
-        dayPart: defaultIsDay ? 'day' : 'night'
+        dayPart: defaultIsDay ? 'day' : 'night',
+        isFallback: true
       },
       activeEvent,
       isDay: defaultIsDay

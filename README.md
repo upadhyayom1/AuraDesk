@@ -60,10 +60,10 @@ AuraDesk/
 │       ├── hooks/                        # Custom hooks (useIPC, useWallpaper, useWeather, etc.)
 │       ├── layouts/                      # Layout wrappers (MainLayout, WindowChrome)
 │       ├── pages/                        # Route pages / Main views
-│       │   ├── Collections/              # Sanctum of Memories (Saved vaults)
-│       │   ├── Discovery/                # Multiversal Portal (Curated & online search)
+│       │   ├── Collections/              # Collections & Playlists manager
+│       │   ├── Discovery/                # Curated & online wallpaper discovery (Unsplash, Pexels)
 │       │   ├── History/                  # Rotation history log
-│       │   ├── Personalization/          # Eye of Agamotto (Rules engine & overrides)
+│       │   ├── Personalization/          # Context-Aware Personalization (Rules engine & overrides)
 │       │   └── Settings/                 # Preferences, API keys, Displays, Calendar auth
 │       ├── routes/                       # Navigation & view routing configuration
 │       ├── services/                     # IPC client wrappers & API abstractions

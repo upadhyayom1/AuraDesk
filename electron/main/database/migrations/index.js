@@ -32,7 +32,7 @@ function runMigrations(db) {
       );
     `);
 
-    // 3. Collections Table (Sanctum of Memories)
+    // 3. Collections Table (Wallpaper Collections)
     db.exec(`
       CREATE TABLE IF NOT EXISTS collections (
         id TEXT PRIMARY KEY,
@@ -90,7 +90,7 @@ function runMigrations(db) {
       ON rotation_history(applied_at DESC);
     `);
 
-    // 7. Personalization Rules Table (Eye of Agamotto)
+    // 7. Personalization Rules Table (Context-Aware Rules)
     db.exec(`
       CREATE TABLE IF NOT EXISTS personalization_rules (
         id TEXT PRIMARY KEY,

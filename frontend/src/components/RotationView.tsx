@@ -44,13 +44,13 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
   const activeCol = collections.find(c => c.id === activeCollectionId) || collections[0];
 
   const intervalOptions = [
-    { label: '15 minutes (Standard)', value: 15 },
+    { label: '1 minute', value: 1 },
+    { label: '15 minutes', value: 15 },
     { label: '30 minutes', value: 30 },
     { label: '1 hour', value: 60 },
     { label: '6 hours', value: 360 },
     { label: '12 hours', value: 720 },
     { label: '24 hours', value: 1440 },
-    { label: '1 minute (Fast Demo)', value: 1 },
   ];
 
   const handleRotateNow = async () => {

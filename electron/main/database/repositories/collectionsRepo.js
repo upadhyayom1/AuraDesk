@@ -1,6 +1,6 @@
 /**
  * Collections Repository
- * Handles SQLite queries for 'collections' and 'collection_items' (Sanctum of Memories).
+ * Handles SQLite queries for 'collections' and 'collection_items'.
  */
 
 const crypto = require('crypto');

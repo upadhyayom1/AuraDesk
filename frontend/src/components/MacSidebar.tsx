@@ -52,6 +52,9 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
     minimizeWindow,
     toggleMaximizeWindow,
     isNativeElectron,
+    backendStatus,
+    backendError,
+    platformName,
   } = useWallpaper();
 
   const isWhitish = glassTheme === 'whitish';
@@ -319,9 +322,40 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
 
         {/* Footer info & settings button */}
         <div className={`flex items-center justify-between text-[11px] px-1 ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
-          <div className="flex items-center gap-1.5 font-mono text-[10px] opacity-75">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span>macOS Ready</span>
+          <div
+            className="flex items-center gap-1.5 font-mono text-[10px] opacity-80"
+            title={backendError || `${platformName} desktop backend: ${backendStatus}`}
+          >
+            {backendStatus === 'ready' && (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>{platformName} Ready</span>
+              </>
+            )}
+            {backendStatus === 'initializing' && (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                <span>Initializing...</span>
+              </>
+            )}
+            {backendStatus === 'error' && (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                <span>Service Error</span>
+              </>
+            )}
+            {backendStatus === 'disconnected' && (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                <span>Web Preview</span>
+              </>
+            )}
+            {backendStatus === 'offline' && (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                <span>Offline</span>
+              </>
+            )}
           </div>
           <button
             onClick={onOpenSettings}

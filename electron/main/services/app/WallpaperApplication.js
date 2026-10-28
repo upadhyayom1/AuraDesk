@@ -126,7 +126,7 @@ class WallpaperApplication {
         this.discoveryService
       );
 
-      // 6. Initialize PersonalizationEngine (Eye of Agamotto)
+      // 6. Initialize PersonalizationEngine
       this.personalizationEngine = new PersonalizationEngine({
         appSettings: this.settings,
         wallpaperRepo: this.wallpaperRepo,

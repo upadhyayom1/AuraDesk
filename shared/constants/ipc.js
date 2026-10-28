@@ -14,7 +14,7 @@ export const IPC_CHANNELS = {
   WALLPAPER_PICK_LOCAL: 'wallpaper:pickLocal',
   WALLPAPER_DISPLAYS: 'wallpaper:displays',
 
-  // Collections (Sanctum of Memories)
+  // Collections & Playlists
   COLLECTION_CREATE: 'collection:create',
   COLLECTION_LIST: 'collection:list',
   COLLECTION_GET: 'collection:get',
@@ -27,7 +27,7 @@ export const IPC_CHANNELS = {
   COLLECTION_EXPORT: 'collection:export',
   COLLECTION_IMPORT: 'collection:import',
 
-  // Rotation & History (Time Stone)
+  // Rotation & History
   ROTATION_GET_CONFIG: 'rotation:getConfig',
   ROTATION_SET_CONFIG: 'rotation:setConfig',
   ROTATION_PAUSE: 'rotation:pause',
@@ -36,7 +36,7 @@ export const IPC_CHANNELS = {
   ROTATION_HISTORY: 'rotation:history',
   ROTATION_CLEAR_HISTORY: 'rotation:clearHistory',
 
-  // Personalization & Rules (Eye of Agamotto)
+  // Personalization & Rules
   PERSONALIZATION_GET_STATE: 'personalization:getState',
   PERSONALIZATION_SET_ENABLED: 'personalization:setEnabled',
   RULE_LIST: 'rule:list',

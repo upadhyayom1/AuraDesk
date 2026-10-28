@@ -19,7 +19,7 @@ const ALLOWED_INVOKE_CHANNELS = new Set([
   'wallpaper:pickLocal',
   'wallpaper:displays',
 
-  // Collections (Sanctum of Memories)
+  // Collections & Playlists
   'collection:create',
   'collection:list',
   'collection:get',
@@ -32,7 +32,7 @@ const ALLOWED_INVOKE_CHANNELS = new Set([
   'collection:export',
   'collection:import',
 
-  // Rotation & History (Time Stone)
+  // Rotation & History
   'rotation:getConfig',
   'rotation:setConfig',
   'rotation:pause',
@@ -41,7 +41,7 @@ const ALLOWED_INVOKE_CHANNELS = new Set([
   'rotation:history',
   'rotation:clearHistory',
 
-  // Personalization & Rules (Eye of Agamotto)
+  // Personalization & Rules
   'personalization:getState',
   'personalization:setEnabled',
   'rule:list',
@@ -50,6 +50,9 @@ const ALLOWED_INVOKE_CHANNELS = new Set([
   'rule:delete',
   'rule:reorder',
   'personalization:evaluate',
+  'personalization:setMockContext',
+  'personalization:getMockContext',
+  'personalization:clearMockContext',
   'override:set',
   'override:clear',
 
