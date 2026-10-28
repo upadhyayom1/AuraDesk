@@ -201,11 +201,16 @@ class CollectionsRepository {
     // Update collection updated_at
     this.db.prepare('UPDATE collections SET updated_at = CURRENT_TIMESTAMP WHERE id = ?').run(collectionId);
 
+    const existingRow = this.db.prepare(`
+      SELECT id, position FROM collection_items 
+      WHERE collection_id = ? AND wallpaper_id = ?
+    `).get(collectionId, wallpaperId);
+
     return {
-      id: Number(result.lastInsertRowid),
+      id: existingRow ? Number(existingRow.id) : Number(result.lastInsertRowid),
       collectionId,
       wallpaperId,
-      position: newPos
+      position: existingRow ? existingRow.position : newPos
     };
   }
 
@@ -218,13 +223,15 @@ class CollectionsRepository {
   removeItem(collectionId, itemId) {
     const deleteTx = this.db.transaction(() => {
       // 1. Delete item
-      let deleteStmt;
-      if (typeof itemId === 'number' || !isNaN(Number(itemId))) {
-        deleteStmt = this.db.prepare('DELETE FROM collection_items WHERE collection_id = ? AND id = ?');
-        deleteStmt.run(collectionId, Number(itemId));
+      if (typeof itemId === 'number') {
+        const deleteStmt = this.db.prepare('DELETE FROM collection_items WHERE collection_id = ? AND id = ?');
+        deleteStmt.run(collectionId, itemId);
       } else {
-        deleteStmt = this.db.prepare('DELETE FROM collection_items WHERE collection_id = ? AND wallpaper_id = ?');
-        deleteStmt.run(collectionId, String(itemId));
+        const deleteStmt = this.db.prepare('DELETE FROM collection_items WHERE collection_id = ? AND wallpaper_id = ?');
+        const res = deleteStmt.run(collectionId, String(itemId));
+        if (res.changes === 0 && !isNaN(Number(itemId))) {
+          this.db.prepare('DELETE FROM collection_items WHERE collection_id = ? AND id = ?').run(collectionId, Number(itemId));
+        }
       }
 
       // 2. Re-pack remaining positions (1, 2, 3...)

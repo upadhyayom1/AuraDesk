@@ -39,6 +39,22 @@ class WallpaperRepository {
    * @returns {Object} mapped wallpaper
    */
   upsert(wp) {
+    if (!wp || !wp.id) {
+      throw new Error('Wallpaper record must have a valid id');
+    }
+
+    let source = wp.source;
+    if (!source || source === 'online') {
+      if (wp.id.startsWith('unsplash:')) source = 'unsplash';
+      else if (wp.id.startsWith('pexels:')) source = 'pexels';
+      else if (wp.id.startsWith('local:') || wp.localPath) source = 'local';
+      else source = 'unsplash';
+    }
+
+    const localPath = wp.localPath || (wp.imageUrl && wp.imageUrl.startsWith('file://') ? wp.imageUrl.replace('file://', '') : null);
+    const imageUrl = wp.imageUrl || wp.thumbUrl || (localPath ? `file://${localPath}` : '');
+    const thumbUrl = wp.thumbUrl || imageUrl || '';
+
     const stmt = this.db.prepare(`
       INSERT INTO wallpapers (
         id, source, title, description, image_url, thumb_url,
@@ -62,16 +78,16 @@ class WallpaperRepository {
 
     stmt.run({
       id: wp.id,
-      source: wp.source,
+      source,
       title: wp.title || '',
       description: wp.description || '',
-      imageUrl: wp.imageUrl,
-      thumbUrl: wp.thumbUrl || wp.imageUrl,
-      photographer: wp.photographer || 'Unknown',
-      creditUrl: wp.creditUrl || '',
-      width: wp.width || 1920,
-      height: wp.height || 1080,
-      localPath: wp.localPath || null
+      imageUrl,
+      thumbUrl,
+      photographer: wp.photographer || (source === 'local' ? 'Local' : 'Unknown'),
+      creditUrl: wp.creditUrl || (source === 'unsplash' ? 'https://unsplash.com' : (source === 'pexels' ? 'https://pexels.com' : '')),
+      width: Number(wp.width) || 1920,
+      height: Number(wp.height) || 1080,
+      localPath: localPath || null
     });
 
     return this.getById(wp.id);

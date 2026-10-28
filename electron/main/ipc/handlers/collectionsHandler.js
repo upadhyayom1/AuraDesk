@@ -26,12 +26,29 @@ const CollectionDeleteSchema = z.object({
   id: z.string().min(1)
 });
 
+const WallpaperObjectSchema = z.object({
+  id: z.string().min(1),
+  source: z.string().optional(),
+  title: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
+  thumbUrl: z.string().optional().nullable(),
+  photographer: z.string().optional().nullable(),
+  creditUrl: z.string().optional().nullable(),
+  width: z.union([z.number(), z.string()]).optional().nullable(),
+  height: z.union([z.number(), z.string()]).optional().nullable(),
+  localPath: z.string().optional().nullable(),
+  category: z.string().optional().nullable(),
+  tags: z.array(z.string()).optional()
+}).passthrough();
+
 const CollectionAddItemSchema = z.object({
-  collectionId: z.string().min(1),
-  wallpaperId: z.string().optional(),
+  collectionId: z.string().min(1, 'Collection ID is required'),
+  wallpaperId: z.union([z.string().min(1), WallpaperObjectSchema]).optional(),
+  wallpaper: WallpaperObjectSchema.optional(),
   localPath: z.string().optional()
-}).refine((data) => data.wallpaperId || data.localPath, {
-  message: 'Either wallpaperId or localPath must be provided'
+}).refine((data) => data.wallpaper || data.wallpaperId || data.localPath, {
+  message: 'Either wallpaper, wallpaperId, or localPath must be provided'
 });
 
 const CollectionRemoveItemSchema = z.object({
@@ -64,6 +81,7 @@ const CollectionImportSchema = z.object({
  */
 function registerCollectionsHandlers(collectionsService, getMainWindow) {
   // 1. collection:create
+  ipcMain.removeHandler('collection:create');
   ipcMain.handle('collection:create', async (_event, payload) => {
     try {
       const parsed = CollectionCreateSchema.safeParse(payload || {});
@@ -78,6 +96,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 2. collection:list
+  ipcMain.removeHandler('collection:list');
   ipcMain.handle('collection:list', async () => {
     try {
       const list = collectionsService.list();
@@ -88,6 +107,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 3. collection:get
+  ipcMain.removeHandler('collection:get');
   ipcMain.handle('collection:get', async (_event, payload) => {
     try {
       const parsed = CollectionGetSchema.safeParse(payload || {});
@@ -102,6 +122,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 4. collection:rename
+  ipcMain.removeHandler('collection:rename');
   ipcMain.handle('collection:rename', async (_event, payload) => {
     try {
       const parsed = CollectionRenameSchema.safeParse(payload || {});
@@ -116,6 +137,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 5. collection:delete
+  ipcMain.removeHandler('collection:delete');
   ipcMain.handle('collection:delete', async (_event, payload) => {
     try {
       const parsed = CollectionDeleteSchema.safeParse(payload || {});
@@ -130,6 +152,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 6. collection:addItem
+  ipcMain.removeHandler('collection:addItem');
   ipcMain.handle('collection:addItem', async (_event, payload) => {
     try {
       const parsed = CollectionAddItemSchema.safeParse(payload || {});
@@ -137,7 +160,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
         return ipcError('VALIDATION', parsed.error.issues[0]?.message);
       }
 
-      let wallpaperTarget = parsed.data.wallpaperId;
+      let wallpaperTarget = parsed.data.wallpaper || parsed.data.wallpaperId;
       if (!wallpaperTarget && parsed.data.localPath) {
         wallpaperTarget = {
           id: `local:${parsed.data.localPath}`,
@@ -151,7 +174,35 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
         };
       }
 
-      const item = collectionsService.addItem(parsed.data.collectionId, wallpaperTarget);
+      if (typeof wallpaperTarget === 'object' && wallpaperTarget !== null) {
+        const id = wallpaperTarget.id || (wallpaperTarget.localPath ? `local:${wallpaperTarget.localPath}` : `local:${Date.now()}`);
+        let source = wallpaperTarget.source;
+        if (!source || source === 'online') {
+          if (id.startsWith('unsplash:')) source = 'unsplash';
+          else if (id.startsWith('pexels:')) source = 'pexels';
+          else if (id.startsWith('local:') || wallpaperTarget.localPath) source = 'local';
+          else source = 'unsplash';
+        }
+        const localPath = wallpaperTarget.localPath || (wallpaperTarget.imageUrl?.startsWith('file://') ? wallpaperTarget.imageUrl.replace('file://', '') : undefined);
+        const imageUrl = wallpaperTarget.imageUrl || wallpaperTarget.thumbUrl || (localPath ? `file://${localPath}` : '');
+        const thumbUrl = wallpaperTarget.thumbUrl || wallpaperTarget.imageUrl || imageUrl;
+
+        wallpaperTarget = {
+          id,
+          source,
+          title: wallpaperTarget.title || 'Wallpaper',
+          description: wallpaperTarget.description || '',
+          imageUrl,
+          thumbUrl,
+          photographer: wallpaperTarget.photographer || (source === 'local' ? 'Local' : 'Online Contributor'),
+          creditUrl: wallpaperTarget.creditUrl || (source === 'unsplash' ? 'https://unsplash.com' : (source === 'pexels' ? 'https://pexels.com' : '')),
+          width: Number(wallpaperTarget.width) || 1920,
+          height: Number(wallpaperTarget.height) || 1080,
+          localPath: localPath || null
+        };
+      }
+
+      const item = await collectionsService.addItem(parsed.data.collectionId, wallpaperTarget);
       return ipcSuccess(item);
     } catch (err) {
       return ipcError('INTERNAL_ERROR', err.message);
@@ -159,6 +210,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 7. collection:removeItem
+  ipcMain.removeHandler('collection:removeItem');
   ipcMain.handle('collection:removeItem', async (_event, payload) => {
     try {
       const parsed = CollectionRemoveItemSchema.safeParse(payload || {});
@@ -173,6 +225,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 8. collection:reorder
+  ipcMain.removeHandler('collection:reorder');
   ipcMain.handle('collection:reorder', async (_event, payload) => {
     try {
       const parsed = CollectionReorderSchema.safeParse(payload || {});
@@ -187,6 +240,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 9. collection:apply
+  ipcMain.removeHandler('collection:apply');
   ipcMain.handle('collection:apply', async (_event, payload) => {
     try {
       const parsed = CollectionApplySchema.safeParse(payload || {});
@@ -201,6 +255,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 10. collection:export (Bonus)
+  ipcMain.removeHandler('collection:export');
   ipcMain.handle('collection:export', async (_event, payload) => {
     try {
       const parsed = CollectionExportSchema.safeParse(payload || {});
@@ -216,6 +271,7 @@ function registerCollectionsHandlers(collectionsService, getMainWindow) {
   });
 
   // 11. collection:import (Bonus)
+  ipcMain.removeHandler('collection:import');
   ipcMain.handle('collection:import', async (_event, payload) => {
     try {
       const parsed = CollectionImportSchema.safeParse(payload || {});

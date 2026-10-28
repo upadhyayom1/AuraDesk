@@ -122,7 +122,8 @@ class WallpaperApplication {
         this.db,
         this.collectionsRepo,
         this.wallpaperRepo,
-        this.wallpaperManager
+        this.wallpaperManager,
+        this.discoveryService
       );
 
       // 6. Initialize PersonalizationEngine (Eye of Agamotto)

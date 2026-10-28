@@ -428,22 +428,33 @@ export const electronBridge = {
   async addCollectionItem(collectionId: string, wallpaper: Wallpaper): Promise<any | null> {
     if (!isElectron()) return null;
     try {
+      const source = wallpaper.isCustom
+        ? 'local'
+        : (wallpaper.id.startsWith('pexels:') ? 'pexels' : (wallpaper.id.startsWith('unsplash:') ? 'unsplash' : 'local'));
+
+      const localPath = (wallpaper as any).localPath || (wallpaper.imageUrl?.startsWith('file://') ? wallpaper.imageUrl.replace('file://', '') : undefined);
+
       const res = await window.api!.invoke('collection:addItem', {
         collectionId,
-        wallpaperId: {
+        wallpaperId: wallpaper.id,
+        wallpaper: {
           id: wallpaper.id,
-          source: wallpaper.isCustom ? 'local' : 'online',
+          source,
           title: wallpaper.title,
           description: wallpaper.category || '',
           imageUrl: wallpaper.imageUrl,
-          thumbUrl: wallpaper.imageUrl,
+          thumbUrl: wallpaper.thumbUrl || wallpaper.imageUrl,
           photographer: (wallpaper as any).photographer || 'AuraDesk',
           creditUrl: wallpaper.sourceCredit || '',
           width: wallpaper.width || 3840,
           height: wallpaper.height || 2160,
-          localPath: wallpaper.imageUrl.startsWith('file://') ? wallpaper.imageUrl.replace('file://', '') : undefined,
+          localPath,
         }
       });
+      if (res?.ok === false) {
+        console.warn('[AuraDesk Bridge] Failed to add item to collection:', res?.error?.message);
+        return null;
+      }
       return res?.data || null;
     } catch (err) {
       console.warn('[AuraDesk Bridge] Failed to add item to collection:', err);

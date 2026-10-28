@@ -35,12 +35,14 @@ class CollectionsService {
    * @param {import('../../database/repositories/collectionsRepo')} collectionsRepo
    * @param {import('../../database/repositories/wallpaperRepo')} wallpaperRepo
    * @param {import('../wallpaper/WallpaperManager')} wallpaperManager
+   * @param {import('../discovery/WallpaperDiscoveryService')} [discoveryService]
    */
-  constructor(db, collectionsRepo, wallpaperRepo, wallpaperManager) {
+  constructor(db, collectionsRepo, wallpaperRepo, wallpaperManager, discoveryService = null) {
     this.db = db;
     this.collectionsRepo = collectionsRepo;
     this.wallpaperRepo = wallpaperRepo;
     this.wallpaperManager = wallpaperManager;
+    this.discoveryService = discoveryService;
   }
 
   /**
@@ -109,13 +111,23 @@ class CollectionsService {
    * @param {string} collectionId
    * @param {string|Object} wallpaperOrId
    */
-  addItem(collectionId, wallpaperOrId) {
+  async addItem(collectionId, wallpaperOrId) {
     let wallpaperId;
 
     if (typeof wallpaperOrId === 'string') {
       wallpaperId = wallpaperOrId;
       // Ensure it exists in wallpapers cache
-      const existing = this.wallpaperRepo.getById(wallpaperId);
+      let existing = this.wallpaperRepo.getById(wallpaperId);
+      if (!existing && this.discoveryService) {
+        try {
+          const fetched = await this.discoveryService.fetchWallpaper(wallpaperId);
+          if (fetched) {
+            existing = this.wallpaperRepo.upsert(fetched);
+          }
+        } catch (fetchErr) {
+          console.warn(`[CollectionsService] Could not auto-fetch wallpaper ${wallpaperId}:`, fetchErr.message);
+        }
+      }
       if (!existing) {
         throw new Error(`Wallpaper ${wallpaperId} must be registered before adding to collection`);
       }
