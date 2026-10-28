@@ -352,7 +352,7 @@ AuraDesk/
 ### 1. Clone the repository
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
+git clone https://github.com/upadhyayom1/AuraDesk
 cd AuraDesk
 ```
 
