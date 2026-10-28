@@ -16,6 +16,7 @@ import {
   Loader2,
   Globe,
   Image as ImageIcon,
+  ChevronRight,
 } from 'lucide-react';
 import { Wallpaper, WallpaperCategory } from '../types/wallpaper';
 import {
@@ -25,10 +26,12 @@ import {
 
 interface WallpaperDiscoveryProps {
   onOpenAddCustom: () => void;
+  onOpenCollections?: () => void;
 }
 
 export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
   onOpenAddCustom,
+  onOpenCollections,
 }) => {
   const {
     currentWallpaper,
@@ -554,6 +557,21 @@ export const WallpaperDiscovery: React.FC<WallpaperDiscoveryProps> = ({
                               );
                             })
                           )}
+                          <div className={`pt-1.5 border-t mt-1.5 ${isWhitish ? 'border-slate-200' : 'border-white/10'}`}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setCollectionPickerOpenForWallId(null);
+                                onOpenCollections?.();
+                              }}
+                              className={`w-full text-center py-1 rounded-md text-[10px] font-semibold flex items-center justify-center gap-1 transition-colors cursor-pointer ${
+                                isWhitish ? 'text-slate-600 hover:text-slate-900 hover:bg-black/5' : 'text-slate-400 hover:text-white hover:bg-white/10'
+                              }`}
+                            >
+                              <span>Manage Collections</span>
+                              <ChevronRight className="w-3 h-3" />
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>

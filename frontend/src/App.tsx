@@ -112,6 +112,7 @@ const AuraDeskApp: React.FC = () => {
           {activeTab === 'discovery' && (
             <WallpaperDiscovery
               onOpenAddCustom={() => setIsAddCustomOpen(true)}
+              onOpenCollections={() => setActiveTab('collections')}
             />
           )}
           {activeTab === 'collections' && (

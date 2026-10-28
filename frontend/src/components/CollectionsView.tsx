@@ -42,12 +42,14 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
   const [collectionWallpapers, setCollectionWallpapers] = useState<Wallpaper[]>([]);
   const [isLoadingItems, setIsLoadingItems] = useState(false);
 
-  // Sync selectedColId if activeCollectionId becomes available
+  // Sync selectedColId whenever activeCollectionId changes or collections load
   useEffect(() => {
-    if (!selectedColId && collections.length > 0) {
-      setSelectedColId(activeCollectionId || collections[0].id);
+    if (activeCollectionId && collections.some(c => c.id === activeCollectionId)) {
+      setSelectedColId(activeCollectionId);
+    } else if (!selectedColId && collections.length > 0) {
+      setSelectedColId(collections[0].id);
     }
-  }, [collections, activeCollectionId, selectedColId]);
+  }, [activeCollectionId, collections]);
 
   // Load authoritative items from SQLite backend whenever selected collection changes
   useEffect(() => {

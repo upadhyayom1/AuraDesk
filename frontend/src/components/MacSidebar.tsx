@@ -230,12 +230,25 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
         {/* Collections Quick Switcher */}
         <div className={`space-y-1 pt-2 border-t ${isWhitish ? 'border-black/10' : 'border-white/10'}`}>
           <div className="flex items-center justify-between px-2">
-            <span className={`text-[10px] uppercase font-mono tracking-wider ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
-              Collections
-            </span>
             <button
-              onClick={onOpenNewWallpaperModal}
-              className={`p-1 rounded-md transition-colors ${isWhitish
+              type="button"
+              onClick={() => onSelectTab('collections')}
+              className={`text-[10px] uppercase font-mono tracking-wider font-semibold transition-colors flex items-center gap-1 cursor-pointer ${
+                isWhitish
+                  ? 'text-slate-500 hover:text-slate-900'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              title="Go to Collections Manager"
+            >
+              <span>Collections</span>
+              <ChevronRight className="w-3 h-3 opacity-60" />
+            </button>
+            <button
+              onClick={() => {
+                onSelectTab('collections');
+                onOpenNewWallpaperModal();
+              }}
+              className={`p-1 rounded-md transition-colors cursor-pointer ${isWhitish
                 ? 'text-slate-500 hover:text-slate-900 hover:bg-black/5'
                 : 'text-slate-400 hover:text-white hover:bg-white/10'
                 }`}
@@ -253,8 +266,9 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
                   key={col.id}
                   onClick={() => {
                     setActiveCollectionId(col.id);
+                    onSelectTab('collections');
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all text-left ${
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all text-left cursor-pointer ${
                     isSelected
                       ? isWhitish
                         ? 'bg-white text-slate-900 font-semibold shadow-xs border border-slate-200'
@@ -263,6 +277,7 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
                       ? 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                     }`}
+                  title={`Open ${col.name} in Collections Manager`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? (isWhitish ? 'bg-slate-900' : 'bg-white') : 'bg-slate-400'}`} />

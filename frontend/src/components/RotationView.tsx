@@ -294,9 +294,23 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
                         <span className="font-mono text-slate-400 tabular-nums">
                           {count} {count === 1 ? 'wallpaper' : 'wallpapers'}
                         </span>
-                        {count === 0 && (
-                          <span className="text-amber-500 text-[10px] font-medium">Empty collection</span>
-                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveCollectionId(col.id);
+                            onOpenCollections();
+                          }}
+                          className={`font-semibold flex items-center gap-0.5 transition-colors cursor-pointer ${
+                            isWhitish
+                              ? 'text-slate-600 hover:text-slate-950'
+                              : 'text-slate-400 hover:text-white'
+                          }`}
+                          title={`Manage ${col.name} in Collections`}
+                        >
+                          <span>Manage</span>
+                          <ChevronRight className="w-3 h-3" />
+                        </button>
                       </div>
                     </div>
                   );
