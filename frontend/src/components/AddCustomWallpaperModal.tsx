@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useWallpaper } from '../context/WallpaperContext';
 import { X, Upload, Link as LinkIcon, Sparkles } from 'lucide-react';
 import { WallpaperCategory } from '../types/wallpaper';
@@ -61,11 +62,17 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <form
         onSubmit={handleSubmit}
-        className={`w-full max-w-lg rounded-3xl p-6 border shadow-2xl space-y-4 ${isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
+        onClick={(e) => e.stopPropagation()}
+        className={`w-full max-w-lg rounded-3xl p-6 border shadow-2xl space-y-4 animate-in zoom-in-95 duration-200 ${isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
           }`}
       >
         <div className="flex items-center justify-between pb-3 border-b border-white/10">
@@ -253,4 +260,6 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
       </form>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : modalContent;
 };

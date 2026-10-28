@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useWallpaper } from '../context/WallpaperContext';
 import {
   Plus,
@@ -6,6 +7,7 @@ import {
   Sparkles,
   Layers,
   X,
+  Eye,
   Loader2,
   FolderOpen,
   RotateCcw,
@@ -41,6 +43,20 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
   const [newColDesc, setNewColDesc] = useState('');
   const [collectionWallpapers, setCollectionWallpapers] = useState<Wallpaper[]>([]);
   const [isLoadingItems, setIsLoadingItems] = useState(false);
+  const [selectedWallpaperForPreview, setSelectedWallpaperForPreview] = useState<Wallpaper | null>(null);
+
+  // Close modals on Escape key
+  useEffect(() => {
+    if (!selectedWallpaperForPreview && !isCreatingNew) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedWallpaperForPreview(null);
+        setIsCreatingNew(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedWallpaperForPreview, isCreatingNew]);
 
   // Sync selectedColId whenever activeCollectionId changes or collections load
   useEffect(() => {
@@ -306,14 +322,18 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
                       : 'mac-glass-card border-white/10 text-white hover:border-white/20'
                       }`}
                   >
-                    <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900 group">
+                    <div 
+                      className="relative aspect-video rounded-xl overflow-hidden bg-slate-900 group cursor-pointer"
+                      onClick={() => setSelectedWallpaperForPreview(wall)}
+                      title="Click to preview wallpaper"
+                    >
                       <img
                         src={wall.thumbUrl || wall.imageUrl}
                         alt={wall.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       {isCurrent && (
-                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-500/95 text-[10px] font-bold text-white shadow-md z-10">
+                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-500/95 text-[10px] font-bold text-white shadow-md z-10 pointer-events-none">
                           Active Desktop
                         </div>
                       )}
@@ -343,6 +363,18 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
                             <span>Set Wallpaper</span>
                           </button>
                         )}
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedWallpaperForPreview(wall);
+                          }}
+                          className="px-2.5 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/30 active:scale-95 transition-all cursor-pointer flex items-center gap-1"
+                          title="Preview wallpaper"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span className="text-[11px] font-semibold">Preview</span>
+                        </button>
                       </div>
                     </div>
 
@@ -394,12 +426,19 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
       )}
 
       {/* Create Collection Modal */}
-      {isCreatingNew && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+      {isCreatingNew && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsCreatingNew(false);
+          }}
+        >
           <form
             onSubmit={handleCreate}
-            className={`w-full max-w-md rounded-3xl p-6 border shadow-2xl space-y-4 ${isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
-              }`}
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-md rounded-3xl p-6 border shadow-2xl space-y-4 animate-in zoom-in-95 duration-200 ${
+              isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
+            }`}
           >
             <div className="flex items-center justify-between pb-3 border-b border-white/10">
               <h3 className="text-sm font-bold">New Wallpaper Collection</h3>
@@ -469,7 +508,147 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
               </button>
             </div>
           </form>
-        </div>
+        </div>,
+        document.body
+      )}
+
+      {/* High-Resolution Wallpaper Preview Modal for Collections */}
+      {selectedWallpaperForPreview && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setSelectedWallpaperForPreview(null);
+          }}
+        >
+          <div
+            className={`relative w-full max-w-3xl max-h-[92vh] overflow-y-auto rounded-3xl p-6 md:p-8 border shadow-2xl space-y-4 animate-in zoom-in-95 duration-200 ${
+              isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-1">
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-0.5 rounded text-[10px] font-mono uppercase border ${
+                  isWhitish
+                    ? 'bg-slate-100 text-slate-800 border-slate-200 font-semibold'
+                    : 'bg-white/10 text-slate-200 border-white/15'
+                }`}>
+                  {selectedWallpaperForPreview.source || 'Collection'}
+                </span>
+                <h2 className={`text-base md:text-lg font-bold tracking-wide truncate ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
+                  {selectedWallpaperForPreview.title}
+                </h2>
+              </div>
+
+              <button
+                onClick={() => setSelectedWallpaperForPreview(null)}
+                className={`p-1.5 rounded-full transition-colors cursor-pointer ${
+                  isWhitish ? 'hover:bg-black/10 text-slate-600' : 'bg-white/10 hover:bg-white/20 text-white'
+                }`}
+                aria-label="Close preview"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* High-res Image Preview */}
+            <div className="aspect-video max-h-[50vh] w-full rounded-2xl overflow-hidden border border-white/15 shadow-2xl bg-slate-950 flex items-center justify-center">
+              <img
+                src={selectedWallpaperForPreview.imageUrl}
+                alt={selectedWallpaperForPreview.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Metadata & Attribution */}
+            <div>
+              {selectedWallpaperForPreview.description && (
+                <p className={`text-xs italic ${isWhitish ? 'text-slate-600' : 'text-slate-300'}`}>
+                  &quot;{selectedWallpaperForPreview.description}&quot;
+                </p>
+              )}
+
+              <div className={`flex items-center gap-2 text-xs mt-1.5 ${isWhitish ? 'text-slate-600' : 'text-slate-300'}`}>
+                <span>Photographed by <strong>{selectedWallpaperForPreview.photographer || selectedWallpaperForPreview.sourceCredit || 'AuraDesk'}</strong></span>
+                {selectedWallpaperForPreview.creditUrl && (
+                  <button
+                    onClick={() => electronBridge.openExternal(selectedWallpaperForPreview.creditUrl!)}
+                    className="inline-flex items-center gap-1 text-cyan-600 dark:text-cyan-400 hover:underline cursor-pointer font-medium"
+                  >
+                    <span>View Profile</span>
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Technical Specs */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+              <div className={`p-2.5 rounded-xl border ${isWhitish ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/5'}`}>
+                <span className={`text-[10px] block font-mono ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>Resolution</span>
+                <span className={`font-mono font-medium ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
+                  {selectedWallpaperForPreview.width} × {selectedWallpaperForPreview.height}
+                </span>
+              </div>
+              <div className={`p-2.5 rounded-xl border ${isWhitish ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/5'}`}>
+                <span className={`text-[10px] block font-mono ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>Aspect Ratio</span>
+                <span className={`font-mono font-medium ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
+                  {selectedWallpaperForPreview.aspectRatio}
+                </span>
+              </div>
+              <div className={`p-2.5 rounded-xl border ${isWhitish ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/5'}`}>
+                <span className={`text-[10px] block font-mono ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>Universal ID</span>
+                <span className={`font-mono font-medium text-[11px] truncate block ${isWhitish ? 'text-slate-900' : 'text-white'}`} title={selectedWallpaperForPreview.id}>
+                  {selectedWallpaperForPreview.id}
+                </span>
+              </div>
+              <div className={`p-2.5 rounded-xl border ${isWhitish ? 'bg-slate-100 border-slate-200' : 'bg-white/5 border-white/5'}`}>
+                <span className={`text-[10px] block font-mono ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>Provider</span>
+                <span className={`capitalize font-medium ${isWhitish ? 'text-cyan-700' : 'text-cyan-300'}`}>
+                  {selectedWallpaperForPreview.source || 'Local'}
+                </span>
+              </div>
+            </div>
+
+            <div className={`pt-3 border-t flex items-center justify-end gap-3 ${isWhitish ? 'border-slate-200' : 'border-white/10'}`}>
+              <button
+                onClick={() => setSelectedWallpaperForPreview(null)}
+                className={`px-4 py-2 rounded-xl text-xs font-medium cursor-pointer transition-colors ${
+                  isWhitish ? 'hover:bg-slate-200 text-slate-700' : 'text-slate-300 hover:text-white'
+                }`}
+              >
+                Close
+              </button>
+              {selectedWallpaperForPreview.id === currentWallpaper?.id ? (
+                <button
+                  onClick={() => {
+                    unsetWallpaper();
+                    setSelectedWallpaperForPreview(null);
+                  }}
+                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs flex items-center gap-2 shadow-md cursor-pointer transition-colors"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Unset Wallpaper</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    applyWallpaper(selectedWallpaperForPreview, 'manual');
+                    setSelectedWallpaperForPreview(null);
+                  }}
+                  className={`px-4 py-2 rounded-xl font-semibold text-xs flex items-center gap-2 shadow-md cursor-pointer transition-colors ${
+                    isWhitish
+                      ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                      : 'bg-white text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                  <span>Apply as Wallpaper</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </div>
   );

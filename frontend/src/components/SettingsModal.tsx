@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useWallpaper } from '../context/WallpaperContext';
 import {
   Sliders,
@@ -59,10 +60,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+  const modalContent = (
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div
-        className={`w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 transition-all ${isWhitish ? 'mac-modal-light border-black/10' : 'mac-modal-dark border-white/15'
+        onClick={(e) => e.stopPropagation()}
+        className={`w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200 transition-all ${isWhitish ? 'mac-modal-light border-black/10' : 'mac-modal-dark border-white/15'
           }`}
       >
         {/* Header */}
@@ -240,4 +247,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
       </div>
     </div>
   );
+
+  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : modalContent;
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { useWallpaper } from '../context/WallpaperContext';
 import {
   Sparkles,
@@ -883,10 +884,16 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
       {/* ======================================================== */}
       {/* Modal: Create Personalization Rule                       */}
       {/* ======================================================== */}
-      {isAddRuleModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+      {isAddRuleModalOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsAddRuleModalOpen(false);
+          }}
+        >
           <div
-            className={`w-full max-w-md rounded-3xl p-6 border shadow-2xl relative ${
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-md rounded-3xl p-6 border shadow-2xl relative animate-in zoom-in-95 duration-200 ${
               isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
             }`}
           >
@@ -1112,16 +1119,23 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ======================================================== */}
       {/* Modal: Create Calendar Keyword Binding                  */}
       {/* ======================================================== */}
-      {isAddBindingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+      {isAddBindingModalOpen && typeof document !== 'undefined' && createPortal(
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsAddBindingModalOpen(false);
+          }}
+        >
           <div
-            className={`w-full max-w-md rounded-3xl p-6 border shadow-2xl relative ${
+            onClick={(e) => e.stopPropagation()}
+            className={`w-full max-w-md rounded-3xl p-6 border shadow-2xl relative animate-in zoom-in-95 duration-200 ${
               isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
             }`}
           >
@@ -1215,7 +1229,8 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
