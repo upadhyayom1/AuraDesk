@@ -65,9 +65,8 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
       <form
         onSubmit={handleSubmit}
-        className={`w-full max-w-lg rounded-3xl p-6 border shadow-2xl space-y-4 ${
-          isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
-        }`}
+        className={`w-full max-w-lg rounded-3xl p-6 border shadow-2xl space-y-4 ${isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
+          }`}
       >
         <div className="flex items-center justify-between pb-3 border-b border-white/10">
           <div className="flex items-center gap-2">
@@ -85,9 +84,8 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
 
         {/* Preview Container */}
         <div
-          className={`aspect-video w-full rounded-2xl overflow-hidden border flex items-center justify-center relative ${
-            isWhitish ? 'bg-slate-100 border-slate-200' : 'bg-black/40 border-white/10'
-          }`}
+          className={`aspect-video w-full rounded-2xl overflow-hidden border flex items-center justify-center relative ${isWhitish ? 'bg-slate-100 border-slate-200' : 'bg-black/40 border-white/10'
+            }`}
         >
           {imageUrl && !previewError ? (
             <img
@@ -118,7 +116,7 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
                 className={`w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl border text-xs font-semibold shadow-xs transition-all active:scale-98 cursor-pointer ${
                   isWhitish
                     ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300'
-                    : 'bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-200 border-cyan-400/30'
+                    : 'bg-white/10 hover:bg-white/20 text-white border-white/20'
                 }`}
               >
                 <Upload className="w-3.5 h-3.5 text-cyan-400" />
@@ -144,11 +142,10 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
                   setPreviewError(false);
                 }}
                 placeholder="https://images.unsplash.com/..."
-                className={`w-full pl-8 pr-3 py-2 rounded-xl border outline-none ${
-                  isWhitish
-                    ? 'bg-white border-slate-300 text-slate-900 focus:border-cyan-500'
-                    : 'bg-black/40 border-white/15 text-white focus:border-cyan-400'
-                }`}
+                className={`w-full pl-8 pr-3 py-2 rounded-xl border outline-none ${isWhitish
+                  ? 'bg-white border-slate-300 text-slate-900 focus:border-cyan-500'
+                  : 'bg-black/40 border-white/15 text-white focus:border-cyan-400'
+                  }`}
               />
             </div>
           </div>
@@ -167,11 +164,10 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
                   type="file"
                   accept="image/*"
                   onChange={handleFileUpload}
-                  className={`w-full text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-medium cursor-pointer ${
-                    isWhitish
-                      ? 'text-slate-600 file:bg-slate-200 file:text-slate-800'
-                      : 'text-slate-400 file:bg-white/15 file:text-white hover:file:bg-white/25'
-                  }`}
+                  className={`w-full text-xs file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-medium cursor-pointer ${isWhitish
+                    ? 'text-slate-600 file:bg-slate-200 file:text-slate-800'
+                    : 'text-slate-400 file:bg-white/15 file:text-white hover:file:bg-white/25'
+                    }`}
                 />
               </div>
             </>
@@ -188,11 +184,10 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
                 value={title}
                 onChange={e => setTitle(e.target.value)}
                 placeholder="e.g. Pacific Coastline"
-                className={`w-full px-3 py-2 rounded-xl border outline-none ${
-                  isWhitish
-                    ? 'bg-white border-slate-300 text-slate-900 focus:border-cyan-500'
-                    : 'bg-black/40 border-white/15 text-white focus:border-cyan-400'
-                }`}
+                className={`w-full px-3 py-2 rounded-xl border outline-none ${isWhitish
+                  ? 'bg-white border-slate-300 text-slate-900 focus:border-cyan-500'
+                  : 'bg-black/40 border-white/15 text-white focus:border-cyan-400'
+                  }`}
               />
             </div>
 
@@ -203,9 +198,8 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
               <select
                 value={category}
                 onChange={e => setCategory(e.target.value as any)}
-                className={`w-full px-3 py-2 rounded-xl border outline-none ${
-                  isWhitish ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-white/15 text-white'
-                }`}
+                className={`w-full px-3 py-2 rounded-xl border outline-none ${isWhitish ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-white/15 text-white'
+                  }`}
               >
                 <option value="nature">Nature</option>
                 <option value="minimalist">Minimalist</option>
@@ -227,11 +221,10 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
               value={tagsStr}
               onChange={e => setTagsStr(e.target.value)}
               placeholder="minimal, dark, 5k"
-              className={`w-full px-3 py-2 rounded-xl border outline-none ${
-                isWhitish
-                  ? 'bg-white border-slate-300 text-slate-900 focus:border-cyan-500'
-                  : 'bg-black/40 border-white/15 text-white focus:border-cyan-400'
-              }`}
+              className={`w-full px-3 py-2 rounded-xl border outline-none ${isWhitish
+                ? 'bg-white border-slate-300 text-slate-900 focus:border-cyan-500'
+                : 'bg-black/40 border-white/15 text-white focus:border-cyan-400'
+                }`}
             />
           </div>
         </div>
@@ -240,16 +233,19 @@ export const AddCustomWallpaperModal: React.FC<AddCustomWallpaperModalProps> = (
           <button
             type="button"
             onClick={onClose}
-            className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
-              isWhitish ? 'hover:bg-slate-200 text-slate-700' : 'hover:bg-white/10 text-slate-300'
-            }`}
+            className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${isWhitish ? 'hover:bg-slate-200 text-slate-700' : 'hover:bg-white/10 text-slate-300'
+              }`}
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={!imageUrl || !title}
-            className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-semibold text-xs shadow-md transition-colors disabled:opacity-50"
+            className={`px-4 py-2 rounded-xl font-semibold text-xs shadow-md transition-colors cursor-pointer disabled:opacity-50 ${
+              isWhitish
+                ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                : 'bg-white/20 hover:bg-white/30 text-white border border-white/20'
+            }`}
           >
             Add & Apply
           </button>

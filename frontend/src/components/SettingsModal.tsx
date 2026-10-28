@@ -62,9 +62,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
       <div
-        className={`w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 transition-all ${
-          isWhitish ? 'mac-modal-light border-black/10' : 'mac-modal-dark border-white/15'
-        }`}
+        className={`w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 transition-all ${isWhitish ? 'mac-modal-light border-black/10' : 'mac-modal-dark border-white/15'
+          }`}
       >
         {/* Header */}
         <div className={`flex items-center justify-between pb-3 border-b ${isWhitish ? 'border-black/8' : 'border-white/10'}`}>
@@ -76,9 +75,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           </div>
           <button
             onClick={onClose}
-            className={`p-1 rounded-lg transition-colors ${
-              isWhitish ? 'text-slate-400 hover:text-slate-800 hover:bg-black/5' : 'text-slate-400 hover:text-white hover:bg-white/10'
-            }`}
+            className={`p-1 rounded-lg transition-colors ${isWhitish ? 'text-slate-400 hover:text-slate-800 hover:bg-black/5' : 'text-slate-400 hover:text-white hover:bg-white/10'
+              }`}
             aria-label="Close preferences"
           >
             <X className="w-4 h-4" />
@@ -96,11 +94,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               <button
                 type="button"
                 onClick={() => setGlassTheme('blackish')}
-                className={`p-2.5 rounded-xl text-left border transition-all text-xs font-medium cursor-pointer ${
-                  !isWhitish
-                    ? 'bg-neutral-800 text-white border-white/30 shadow-md ring-1 ring-cyan-400/30'
-                    : 'bg-white/40 text-slate-700 border-black/10 hover:bg-white/70'
-                }`}
+                className={`p-2.5 rounded-xl text-left border transition-all text-xs font-medium cursor-pointer ${!isWhitish
+                  ? 'bg-neutral-800 text-white border-white/30 shadow-md ring-1 ring-cyan-400/30'
+                  : 'bg-white/40 text-slate-700 border-black/10 hover:bg-white/70'
+                  }`}
               >
                 <span className="font-bold block">Obsidian Dark</span>
                 <span className={`text-[10px] block ${!isWhitish ? 'text-slate-300' : 'text-slate-500'}`}>
@@ -111,11 +108,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
               <button
                 type="button"
                 onClick={() => setGlassTheme('whitish')}
-                className={`p-2.5 rounded-xl text-left border transition-all text-xs font-medium cursor-pointer ${
-                  isWhitish
-                    ? 'bg-white text-slate-900 border-white shadow-md ring-1 ring-blue-500/30'
-                    : 'bg-white/5 text-slate-300 border-white/10 hover:text-white'
-                }`}
+                className={`p-2.5 rounded-xl text-left border transition-all text-xs font-medium cursor-pointer ${isWhitish
+                  ? 'bg-white text-slate-900 border-white shadow-md ring-1 ring-blue-500/30'
+                  : 'bg-white/5 text-slate-300 border-white/10 hover:text-white'
+                  }`}
               >
                 <span className="font-bold block">Frosted Light</span>
                 <span className={`text-[10px] block ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
@@ -142,15 +138,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                   key={opt.mode}
                   type="button"
                   onClick={() => setScalingMode(opt.mode as ScalingMode)}
-                  className={`p-2 rounded-xl text-left border transition-all text-xs font-medium cursor-pointer ${
+                  className={`p-2 rounded-xl text-left border transition-all text-xs font-semibold cursor-pointer ${
                     scalingMode === opt.mode
                       ? isWhitish
-                        ? 'bg-blue-500/15 text-blue-900 border-blue-400/40 font-semibold'
-                        : 'bg-cyan-500/20 text-cyan-200 border-cyan-400/40 font-semibold'
+                        ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                        : 'bg-white/20 text-white border-white/30 shadow-xs'
                       : isWhitish
-                      ? 'bg-white/40 text-slate-600 border-black/8 hover:text-slate-900'
+                      ? 'bg-white/40 text-slate-700 border-black/8 hover:text-slate-900'
                       : 'bg-white/5 text-slate-400 border-white/8 hover:text-white'
-                  }`}
+                    }`}
                 >
                   {opt.label}
                 </button>
@@ -180,21 +176,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 value={cityInput}
                 onChange={e => setCityInput(e.target.value)}
                 placeholder="e.g. San Francisco, Tokyo, London"
-                className={`flex-1 px-3 py-2 rounded-xl border text-xs focus:outline-none transition-all ${
-                  isWhitish
-                    ? 'bg-white border-black/15 text-slate-900 focus:border-indigo-600'
-                    : 'bg-black/30 border-white/15 text-white focus:border-cyan-400'
-                }`}
+                className={`flex-1 px-3 py-2 rounded-xl border text-xs focus:outline-none transition-all ${isWhitish
+                  ? 'bg-white border-black/15 text-slate-900 focus:border-indigo-600'
+                  : 'bg-black/30 border-white/15 text-white focus:border-cyan-400'
+                  }`}
               />
               <button
                 type="button"
                 onClick={handleSaveCity}
                 disabled={isSavingCity || !cityInput.trim()}
-                className={`px-3 py-2 rounded-xl font-medium transition-all text-xs cursor-pointer disabled:opacity-50 ${
-                  isWhitish
-                    ? 'bg-slate-900 text-white hover:bg-slate-800'
-                    : 'bg-white/15 hover:bg-white/25 text-white'
-                }`}
+                className={`px-3 py-2 rounded-xl font-medium transition-all text-xs cursor-pointer disabled:opacity-50 ${isWhitish
+                  ? 'bg-slate-900 text-white hover:bg-slate-800'
+                  : 'bg-white/15 hover:bg-white/25 text-white'
+                  }`}
               >
                 {isSavingCity ? 'Saving...' : 'Update'}
               </button>
@@ -219,15 +213,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
                 updateSettings({ launchOnStartup: nextVal });
                 electronBridge.saveSettings({ launchOnStartup: nextVal }).catch(console.warn);
               }}
-              className={`w-11 h-6 rounded-full transition-colors relative p-0.5 cursor-pointer ${
-                settings.launchOnStartup ? (isWhitish ? 'bg-indigo-600' : 'bg-cyan-500') : (isWhitish ? 'bg-slate-300' : 'bg-slate-700')
-              }`}
+              className={`w-11 h-6 rounded-full transition-colors relative p-0.5 cursor-pointer ${settings.launchOnStartup ? (isWhitish ? 'bg-indigo-600' : 'bg-cyan-500') : (isWhitish ? 'bg-slate-300' : 'bg-slate-700')
+                }`}
               aria-label="Toggle launch on login"
             >
               <div
-                className={`w-5 h-5 rounded-full bg-white transition-transform ${
-                  settings.launchOnStartup ? 'translate-x-5' : 'translate-x-0'
-                }`}
+                className={`w-5 h-5 rounded-full bg-white transition-transform ${settings.launchOnStartup ? 'translate-x-5' : 'translate-x-0'
+                  }`}
               />
             </button>
           </div>
@@ -237,11 +229,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
         <div className={`pt-3 border-t flex items-center justify-end ${isWhitish ? 'border-black/8' : 'border-white/10'}`}>
           <button
             onClick={onClose}
-            className={`px-5 py-2 rounded-xl font-medium text-xs transition-all cursor-pointer ${
-              isWhitish
-                ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-sm'
-                : 'bg-white/20 hover:bg-white/30 text-white shadow-sm'
-            }`}
+            className={`px-5 py-2 rounded-xl font-medium text-xs transition-all cursor-pointer ${isWhitish
+              ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-sm'
+              : 'bg-white/20 hover:bg-white/30 text-white shadow-sm'
+              }`}
           >
             Done
           </button>

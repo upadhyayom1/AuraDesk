@@ -422,9 +422,9 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
           <button
             onClick={handleEvaluateNow}
             disabled={isEvaluating}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer ${
               isWhitish
-                ? 'bg-white/80 hover:bg-white text-slate-700 border-slate-300/80 shadow-xs'
+                ? 'bg-white hover:bg-slate-50 text-slate-800 border-slate-300 shadow-xs'
                 : 'bg-white/10 hover:bg-white/15 text-slate-200 border-white/15'
             }`}
             title="Evaluate rules against current environmental snapshot without changing wallpaper"
@@ -435,12 +435,14 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
 
           <button
             onClick={handleToggleMaster}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold shadow-sm transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold shadow-xs transition-all cursor-pointer ${
               isEnabled
-                ? 'bg-gradient-to-r from-cyan-500 to-indigo-600 hover:brightness-110 text-white border border-white/20'
+                ? isWhitish
+                  ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                  : 'bg-white/20 hover:bg-white/30 text-white border border-white/25'
                 : isWhitish
                 ? 'bg-slate-200 hover:bg-slate-300 text-slate-700 border border-slate-300'
-                : 'bg-white/15 hover:bg-white/20 text-white border border-white/20'
+                : 'bg-white/10 hover:bg-white/15 text-white border border-white/20'
             }`}
           >
             <Power className="w-3.5 h-3.5" />
@@ -588,8 +590,8 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
         <div
           className={`p-4 rounded-2xl border animate-fade-in ${
             isWhitish
-              ? 'bg-cyan-50/70 border-cyan-200 text-cyan-950 shadow-xs'
-              : 'bg-cyan-950/30 border-cyan-500/30 text-cyan-100'
+              ? 'bg-slate-50 border-slate-200 text-slate-900 shadow-xs'
+              : 'bg-white/5 border-white/10 text-white'
           }`}
         >
           <div className="flex items-center justify-between mb-2">
@@ -677,7 +679,11 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
               </p>
               <button
                 onClick={() => setIsAddRuleModalOpen(true)}
-                className="mt-4 px-4 py-1.5 rounded-xl text-xs font-medium bg-cyan-600 hover:bg-cyan-700 text-white transition-colors"
+                className={`mt-4 px-4 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                  isWhitish
+                    ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                    : 'bg-white/20 hover:bg-white/30 text-white border border-white/20'
+                }`}
               >
                 Create First Rule
               </button>
@@ -735,13 +741,13 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => handleToggleRule(rule)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-medium border transition-colors ${
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-colors ${
                         isRuleEnabled
                           ? isWhitish
-                            ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                            ? 'bg-emerald-100 border-emerald-300 text-emerald-900 hover:bg-emerald-200'
                             : 'bg-emerald-500/20 border-emerald-400/30 text-emerald-300 hover:bg-emerald-500/30'
                           : isWhitish
-                          ? 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'
+                          ? 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-slate-200'
                           : 'bg-white/10 border-white/15 text-slate-400 hover:bg-white/15'
                       }`}
                       title={isRuleEnabled ? 'Pause Rule' : 'Enable Rule'}
@@ -787,7 +793,11 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
             ) : (
               <button
                 onClick={handleConnectCalendar}
-                className="px-3 py-1.5 rounded-xl text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors flex items-center gap-1.5"
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  isWhitish
+                    ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                    : 'bg-white/20 hover:bg-white/30 text-white border border-white/20'
+                }`}
               >
                 <Calendar className="w-3.5 h-3.5" />
                 <span>Link Google Calendar</span>
@@ -835,7 +845,11 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-300 border border-cyan-500/30">
+                  <span className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold border ${
+                    isWhitish
+                      ? 'bg-slate-100 text-slate-900 border-slate-200'
+                      : 'bg-white/10 text-white border-white/15'
+                  }`}>
                     &quot;{b.matchValue}&quot;
                   </span>
                   <span className="text-xs opacity-80 truncate">
@@ -908,12 +922,14 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
                   <button
                     type="button"
                     onClick={() => setNewRuleConditionType('TIME_RANGE')}
-                    className={`py-2 px-2.5 rounded-xl text-xs font-medium border text-center transition-all ${
+                    className={`py-2 px-2.5 rounded-xl text-xs font-semibold border text-center transition-all cursor-pointer ${
                       newRuleConditionType === 'TIME_RANGE'
-                        ? 'bg-cyan-500 text-white border-cyan-400'
+                        ? isWhitish
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                          : 'bg-white/25 text-white border-white/30 shadow-xs'
                         : isWhitish
-                        ? 'bg-white border-slate-200 text-slate-700'
-                        : 'bg-white/5 border-white/10 text-slate-300'
+                        ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
                     }`}
                   >
                     Time Range
@@ -921,12 +937,14 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
                   <button
                     type="button"
                     onClick={() => setNewRuleConditionType('WEATHER')}
-                    className={`py-2 px-2.5 rounded-xl text-xs font-medium border text-center transition-all ${
+                    className={`py-2 px-2.5 rounded-xl text-xs font-semibold border text-center transition-all cursor-pointer ${
                       newRuleConditionType === 'WEATHER'
-                        ? 'bg-cyan-500 text-white border-cyan-400'
+                        ? isWhitish
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                          : 'bg-white/25 text-white border-white/30 shadow-xs'
                         : isWhitish
-                        ? 'bg-white border-slate-200 text-slate-700'
-                        : 'bg-white/5 border-white/10 text-slate-300'
+                        ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
                     }`}
                   >
                     Weather
@@ -934,12 +952,14 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
                   <button
                     type="button"
                     onClick={() => setNewRuleConditionType('DAY_PART')}
-                    className={`py-2 px-2.5 rounded-xl text-xs font-medium border text-center transition-all ${
+                    className={`py-2 px-2.5 rounded-xl text-xs font-semibold border text-center transition-all cursor-pointer ${
                       newRuleConditionType === 'DAY_PART'
-                        ? 'bg-cyan-500 text-white border-cyan-400'
+                        ? isWhitish
+                          ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                          : 'bg-white/25 text-white border-white/30 shadow-xs'
                         : isWhitish
-                        ? 'bg-white border-slate-200 text-slate-700'
-                        : 'bg-white/5 border-white/10 text-slate-300'
+                        ? 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10'
                     }`}
                   >
                     Day Part
@@ -1071,7 +1091,11 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-600 hover:bg-cyan-700 text-white shadow-md transition-colors"
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition-colors cursor-pointer ${
+                    isWhitish
+                      ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                      : 'bg-white/20 hover:bg-white/30 text-white border border-white/20'
+                  }`}
                 >
                   Create Rule
                 </button>
@@ -1170,7 +1194,11 @@ export const PersonalizationView: React.FC<PersonalizationViewProps> = ({ onOpen
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-colors"
+                  className={`px-4 py-2 rounded-xl text-xs font-semibold shadow-md transition-colors cursor-pointer ${
+                    isWhitish
+                      ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                      : 'bg-white/20 hover:bg-white/30 text-white border border-white/20'
+                  }`}
                 >
                   Add Binding
                 </button>

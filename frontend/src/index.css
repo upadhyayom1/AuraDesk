@@ -113,6 +113,47 @@
   pointer-events: none;
 }
 
+/* 4. Native macOS High-Contrast Button Tokens */
+.mac-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.mac-btn-primary:active {
+  transform: scale(0.96);
+}
+
+/* Light theme button: solid dark slate with maximum contrast */
+.mac-btn-primary-light {
+  background-color: #0f172a;
+  color: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.1);
+}
+.mac-btn-primary-light:hover {
+  background-color: #1e293b;
+}
+
+/* Dark theme button: luminous frosted white pill */
+.mac-btn-primary-dark {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.mac-btn-primary-dark:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 /* Custom sleek scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

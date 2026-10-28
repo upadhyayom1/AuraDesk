@@ -110,11 +110,11 @@ class PersonalizationEngine {
       const activeEvent = typeof eventOrSummary === 'object' && eventOrSummary.id
         ? eventOrSummary
         : {
-            id: 'mock-event-id',
-            title: summary,
-            startTime: new Date().toISOString(),
-            endTime: new Date(Date.now() + 3600000).toISOString()
-          };
+          id: 'mock-event-id',
+          title: summary,
+          startTime: new Date().toISOString(),
+          endTime: new Date(Date.now() + 3600000).toISOString()
+        };
 
       this.mockContext = {
         ...(this.mockContext || {}),

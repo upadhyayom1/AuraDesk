@@ -221,7 +221,11 @@ export const MacTrayMenu: React.FC<MacTrayMenuProps> = ({ onOpenAppWindow, onOpe
               setIsTrayOpen(false);
               onOpenAppWindow();
             }}
-            className="flex items-center gap-1.5 text-xs font-medium text-cyan-300 hover:text-cyan-200 transition-colors py-1 px-2.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-400/30"
+            className={`flex items-center gap-1.5 text-xs font-semibold transition-colors py-1.5 px-3 rounded-xl border cursor-pointer ${
+              isWhitish
+                ? 'bg-slate-900 hover:bg-slate-800 text-white border-transparent shadow-xs'
+                : 'bg-white/15 hover:bg-white/25 text-white border-white/20'
+            }`}
           >
             <span>Open AuraDesk</span>
             <Maximize2 className="w-3 h-3" />

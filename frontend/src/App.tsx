@@ -29,9 +29,8 @@ const AuraDeskApp: React.FC = () => {
 
   return (
     <div
-      className={`relative w-screen h-screen overflow-hidden flex flex-row font-sans select-none transition-colors duration-500 ${
-        isWhitish ? 'bg-slate-100 text-slate-900' : 'bg-[#090d16] text-slate-100'
-      }`}
+      className={`relative w-screen h-screen overflow-hidden flex flex-row font-sans select-none transition-colors duration-500 ${isWhitish ? 'bg-slate-100 text-slate-900' : 'bg-[#090d16] text-slate-100'
+        }`}
     >
       {/* Dynamic Ambient Desktop Backdrop (renders current wallpaper with blur and subtle motion) */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -39,17 +38,15 @@ const AuraDeskApp: React.FC = () => {
           src={currentWallpaper.imageUrl}
           alt=""
           aria-hidden="true"
-          className={`w-full h-full object-cover filter blur-3xl scale-110 transition-all duration-1000 ease-out ${
-            isWhitish ? 'opacity-35' : 'opacity-15'
-          }`}
+          className={`w-full h-full object-cover filter blur-3xl scale-110 transition-all duration-1000 ease-out ${isWhitish ? 'opacity-35' : 'opacity-15'
+            }`}
         />
         {/* Subtle vignette layer */}
         <div
-          className={`absolute inset-0 ${
-            isWhitish
-              ? 'bg-radial from-transparent via-white/30 to-slate-100/70'
-              : 'bg-radial from-transparent via-black/40 to-[#070b13]'
-          }`}
+          className={`absolute inset-0 ${isWhitish
+            ? 'bg-radial from-transparent via-white/30 to-slate-100/70'
+            : 'bg-radial from-transparent via-black/40 to-[#070b13]'
+            }`}
         ></div>
       </div>
 
@@ -63,17 +60,15 @@ const AuraDeskApp: React.FC = () => {
 
       {/* Edge-to-Edge Right Main Content Viewport */}
       <div
-        className={`relative z-10 flex-1 h-full flex flex-col overflow-hidden ${
-          isWhitish ? 'bg-white/30' : 'bg-black/20'
-        }`}
+        className={`relative z-10 flex-1 h-full flex flex-col overflow-hidden ${isWhitish ? 'bg-white/30' : 'bg-black/20'
+          }`}
       >
         {/* macOS Native Window Titlebar Region (draggable, integrated status & tools) */}
         <header
-          className={`h-11 px-6 flex items-center justify-between text-xs shrink-0 backdrop-blur-md border-b app-drag ${
-            isWhitish
-              ? 'border-black/8 bg-white/50 text-slate-700'
-              : 'border-white/10 bg-white/5 text-slate-300'
-          }`}
+          className={`h-11 px-6 flex items-center justify-between text-xs shrink-0 backdrop-blur-md border-b app-drag ${isWhitish
+            ? 'border-black/8 bg-white/50 text-slate-700'
+            : 'border-white/10 bg-white/5 text-slate-300'
+            }`}
         >
           <div className="flex items-center gap-2 app-no-drag">
             <span className={`font-semibold capitalize text-sm tracking-wide ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
@@ -90,11 +85,10 @@ const AuraDeskApp: React.FC = () => {
             <button
               type="button"
               onClick={() => setGlassTheme(isWhitish ? 'blackish' : 'whitish')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium transition-all shadow-xs cursor-pointer ${
-                isWhitish
-                  ? 'bg-white/90 hover:bg-white text-slate-800 border-slate-300/80 hover:border-slate-400 shadow-slate-200/50'
-                  : 'bg-white/10 hover:bg-white/15 text-slate-200 border-white/20 hover:border-white/30'
-              }`}
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium transition-all shadow-xs cursor-pointer ${isWhitish
+                ? 'bg-white/90 hover:bg-white text-slate-800 border-slate-300/80 hover:border-slate-400 shadow-slate-200/50'
+                : 'bg-white/10 hover:bg-white/15 text-slate-200 border-white/20 hover:border-white/30'
+                }`}
               title={isWhitish ? 'Switch to Dark Mode (Obsidian Glass)' : 'Switch to Light Mode (Frosted Glass)'}
               aria-label={isWhitish ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
             >

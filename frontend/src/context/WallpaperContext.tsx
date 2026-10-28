@@ -28,6 +28,7 @@ interface WallpaperContextType {
   secondsRemaining: number;
   isLoadingBackend: boolean;
   applyWallpaper: (wallpaper: Wallpaper, reason?: HistoryEntry['reason']) => Promise<boolean>;
+  unsetWallpaper: () => Promise<boolean>;
   rotateNext: (isManual?: boolean) => Promise<void>;
   rollbackHistory: (entryId: string) => Promise<void>;
   clearHistory: () => Promise<boolean>;
@@ -347,6 +348,39 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     await applyWallpaper(target, 'manual');
   }, [history, applyWallpaper]);
 
+  // Unset current wallpaper: clears manual override and reverts to prior wallpaper or next rotation item
+  const unsetWallpaper = useCallback(async (): Promise<boolean> => {
+    try {
+      if (isElectron()) {
+        await electronBridge.clearOverride();
+      }
+
+      // If previous wallpaper exists in history, revert to it
+      if (history.length > 1) {
+        const prevEntry = history[1];
+        await rollbackHistory(prevEntry.id);
+        return true;
+      }
+
+      // If rotation or collection exists, rotate to next
+      if (isElectron()) {
+        const nextWp = await electronBridge.rotateNow();
+        if (nextWp) {
+          setCurrentWallpaper(normalizeBackendWallpaper(nextWp));
+          await refreshHistory();
+          return true;
+        }
+      }
+
+      // Reset to engine initial wallpaper
+      setCurrentWallpaper(INITIAL_WALLPAPER);
+      return true;
+    } catch (err) {
+      console.warn('[WallpaperContext] Failed to unset wallpaper:', err);
+      return false;
+    }
+  }, [history, rollbackHistory, refreshHistory]);
+
   // Clear rotation history in SQLite
   const clearHistory = useCallback(async (): Promise<boolean> => {
     if (isElectron()) {
@@ -584,6 +618,7 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         secondsRemaining,
         isLoadingBackend,
         applyWallpaper,
+        unsetWallpaper,
         rotateNext,
         rollbackHistory,
         clearHistory,
@@ -611,18 +646,18 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         rules: [],
         calendarEvents: [],
         weatherCondition: 'clear',
-        setWeatherCondition: () => {},
+        setWeatherCondition: () => { },
         simulatedHour: 14,
-        setSimulatedHour: () => {},
+        setSimulatedHour: () => { },
         isLiveClock: true,
-        setIsLiveClock: () => {},
+        setIsLiveClock: () => { },
         timeOfDay: 'day',
         activeRuleStatus: { reason: 'Active Rotation', description: 'Scheduled rotation active' },
-        toggleRule: () => {},
-        addRule: () => {},
-        deleteRule: () => {},
-        addCalendarEvent: () => {},
-        deleteCalendarEvent: () => {},
+        toggleRule: () => { },
+        addRule: () => { },
+        deleteRule: () => { },
+        addCalendarEvent: () => { },
+        deleteCalendarEvent: () => { },
       }}
     >
       {children}

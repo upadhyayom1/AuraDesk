@@ -66,11 +66,10 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
 
   return (
     <aside
-      className={`w-64 h-full flex flex-col justify-between p-3.5 backdrop-blur-3xl border-r select-none transition-all duration-300 ${
-        isWhitish
-          ? 'bg-white/40 border-white/60 text-slate-800'
-          : 'bg-black/40 border-white/10 text-slate-200'
-      }`}
+      className={`w-64 h-full flex flex-col justify-between p-3.5 backdrop-blur-3xl border-r select-none transition-all duration-300 ${isWhitish
+        ? 'bg-white/40 border-white/60 text-slate-800'
+        : 'bg-black/40 border-white/10 text-slate-200'
+        }`}
     >
       {/* Top Window Controls & Branding */}
       <div className="space-y-4">
@@ -147,11 +146,10 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
             <button
               type="button"
               onClick={() => setGlassTheme(isWhitish ? 'blackish' : 'whitish')}
-              className={`p-1.5 rounded-full border transition-all ${
-                isWhitish
-                  ? 'bg-black/5 hover:bg-black/10 border-black/10 text-slate-700'
-                  : 'bg-white/10 hover:bg-white/15 border-white/15 text-slate-200'
-              }`}
+              className={`p-1.5 rounded-full border transition-all ${isWhitish
+                ? 'bg-black/5 hover:bg-black/10 border-black/10 text-slate-700'
+                : 'bg-white/10 hover:bg-white/15 border-white/15 text-slate-200'
+                }`}
               title={isWhitish ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
               aria-label="Toggle Theme"
             >
@@ -192,27 +190,25 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id)}
-                className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium transition-all group ${
-                  isActive
-                    ? isWhitish
-                      ? 'bg-white/90 text-slate-900 shadow-sm border border-white/80'
-                      : 'bg-white/15 text-white shadow-sm border border-white/20'
-                    : isWhitish
+                className={`w-full flex items-center justify-between px-2.5 py-2 rounded-xl text-xs font-medium transition-all group ${isActive
+                  ? isWhitish
+                    ? 'bg-white/90 text-slate-900 shadow-sm border border-white/80'
+                    : 'bg-white/15 text-white shadow-sm border border-white/20'
+                  : isWhitish
                     ? 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                     : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <div className="flex items-center gap-2.5">
                   <Icon
-                    className={`w-4 h-4 transition-colors ${
-                      isActive
-                        ? isWhitish
-                          ? 'text-cyan-600'
-                          : 'text-cyan-300'
-                        : isWhitish
+                    className={`w-4 h-4 transition-colors ${isActive
+                      ? isWhitish
+                        ? 'text-indigo-600'
+                        : 'text-cyan-300'
+                      : isWhitish
                         ? 'text-slate-500 group-hover:text-slate-800'
                         : 'text-slate-400 group-hover:text-slate-200'
-                    }`}
+                      }`}
                   />
                   <span>{item.label}</span>
                 </div>
@@ -239,11 +235,10 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
             </span>
             <button
               onClick={onOpenNewWallpaperModal}
-              className={`p-1 rounded-md transition-colors ${
-                isWhitish
-                  ? 'text-slate-500 hover:text-slate-900 hover:bg-black/5'
-                  : 'text-slate-400 hover:text-white hover:bg-white/10'
-              }`}
+              className={`p-1 rounded-md transition-colors ${isWhitish
+                ? 'text-slate-500 hover:text-slate-900 hover:bg-black/5'
+                : 'text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
               title="Add Wallpaper / Collection"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -262,15 +257,15 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
                   className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all text-left ${
                     isSelected
                       ? isWhitish
-                        ? 'bg-white/80 text-cyan-800 font-semibold shadow-xs border border-white/90'
-                        : 'bg-cyan-500/15 text-cyan-200 border border-cyan-400/30'
+                        ? 'bg-white text-slate-900 font-semibold shadow-xs border border-slate-200'
+                        : 'bg-white/15 text-white font-semibold border border-white/20'
                       : isWhitish
                       ? 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-cyan-500' : 'bg-slate-400'}`} />
+                    <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? (isWhitish ? 'bg-slate-900' : 'bg-white') : 'bg-slate-400'}`} />
                     <span className="truncate">{col.name}</span>
                   </div>
                   <span className="text-[10px] font-mono opacity-60">
@@ -287,11 +282,10 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
       <div className={`pt-3 border-t space-y-2.5 ${isWhitish ? 'border-black/10' : 'border-white/10'}`}>
         {/* Active Wallpaper Micro Thumbnail */}
         <div
-          className={`flex items-center gap-2.5 p-2 rounded-xl border ${
-            isWhitish
-              ? 'bg-white/50 border-white/70 shadow-xs'
-              : 'bg-white/5 border-white/10'
-          }`}
+          className={`flex items-center gap-2.5 p-2 rounded-xl border ${isWhitish
+            ? 'bg-white/50 border-white/70 shadow-xs'
+            : 'bg-white/5 border-white/10'
+            }`}
         >
           <img
             src={currentWallpaper.imageUrl}
@@ -299,7 +293,7 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
             className="w-8 h-8 rounded-lg object-cover border border-white/30 shrink-0"
           />
           <div className="min-w-0 flex-1">
-            <p className={`text-[10px] font-mono truncate uppercase ${isWhitish ? 'text-cyan-700 font-bold' : 'text-cyan-300'}`}>
+            <p className={`text-[10px] font-mono truncate uppercase ${isWhitish ? 'text-slate-500 font-semibold' : 'text-slate-400 font-medium'}`}>
               System Wallpaper
             </p>
             <p className={`text-xs font-medium truncate ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
@@ -316,9 +310,8 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
           </div>
           <button
             onClick={onOpenSettings}
-            className={`p-1 rounded-md transition-colors ${
-              isWhitish ? 'hover:bg-black/5 hover:text-slate-900' : 'hover:bg-white/10 hover:text-white'
-            }`}
+            className={`p-1 rounded-md transition-colors ${isWhitish ? 'hover:bg-black/5 hover:text-slate-900' : 'hover:bg-white/10 hover:text-white'
+              }`}
             title="Application Settings"
             aria-label="Settings"
           >

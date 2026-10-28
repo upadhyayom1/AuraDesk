@@ -99,8 +99,8 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
             className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
               schedulerRunning
                 ? isWhitish
-                  ? 'bg-blue-500/15 border-blue-400/40 text-blue-900 shadow-xs'
-                  : 'bg-cyan-500/20 border-cyan-400/40 text-cyan-300 shadow-md'
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-800 shadow-xs'
+                  : 'bg-emerald-500/20 border-emerald-400/30 text-emerald-300 shadow-md'
                 : isWhitish
                 ? 'bg-black/5 border-black/10 text-slate-500'
                 : 'bg-white/5 border-white/10 text-slate-400'
@@ -160,8 +160,8 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
                   ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-900 border border-amber-400/40'
                   : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-400/40'
                 : isWhitish
-                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-md'
-                : 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold shadow-md'
+                ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-md'
+                : 'bg-white text-slate-950 hover:bg-slate-100 font-bold shadow-md'
             }`}
           >
             {schedulerRunning ? (
@@ -218,8 +218,8 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
               <button
                 type="button"
                 onClick={onOpenCollections}
-                className={`text-xs font-medium flex items-center gap-1 transition-colors cursor-pointer ${
-                  isWhitish ? 'text-blue-600 hover:text-blue-800' : 'text-cyan-300 hover:text-cyan-200'
+                className={`text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
+                  isWhitish ? 'text-slate-800 hover:text-slate-900' : 'text-slate-200 hover:text-white'
                 }`}
               >
                 <span>Manage Collections</span>
@@ -243,10 +243,10 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
                 <button
                   type="button"
                   onClick={onOpenCollections}
-                  className={`mt-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+                  className={`mt-2 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     isWhitish
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/30'
+                      ? 'bg-slate-900 hover:bg-slate-800 text-white'
+                      : 'bg-white/10 hover:bg-white/20 text-white border border-white/20'
                   }`}
                 >
                   Create Collection
@@ -265,8 +265,8 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
                       className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
                         isSelected
                           ? isWhitish
-                            ? 'bg-white border-blue-500/50 shadow-md ring-2 ring-blue-500/30 text-slate-900'
-                            : 'bg-white/15 border-cyan-400/50 shadow-lg ring-1 ring-cyan-400/40 text-white'
+                            ? 'bg-white border-slate-300 shadow-md ring-2 ring-slate-900/10 text-slate-900'
+                            : 'bg-white/15 border-white/30 shadow-lg ring-1 ring-white/30 text-white'
                           : isWhitish
                           ? 'bg-white/40 border-black/8 hover:bg-white/80 text-slate-700'
                           : 'bg-white/5 border-white/8 hover:bg-white/10 text-slate-300'
@@ -274,7 +274,7 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <h4 className="text-xs font-bold truncate">{col.name}</h4>
+                          <h4 className="font-semibold text-xs truncate">{col.name}</h4>
                           <p className={`text-[11px] truncate mt-0.5 ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
                             {col.description || `${count} wallpapers`}
                           </p>
@@ -282,7 +282,7 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
                         {isSelected && (
                           <div
                             className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${
-                              isWhitish ? 'bg-blue-600 text-white' : 'bg-cyan-400 text-slate-950'
+                              isWhitish ? 'bg-slate-900 text-white' : 'bg-white text-slate-950'
                             }`}
                           >
                             <Check className="w-3 h-3 stroke-[3]" />
@@ -324,7 +324,7 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
                 <label className={`font-semibold ${isWhitish ? 'text-slate-800' : 'text-slate-200'}`}>
                   Change Wallpaper Every
                 </label>
-                <span className={`font-mono font-medium ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`}>
+                <span className={`font-mono font-medium ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
                   {settings.rotationIntervalMinutes} minutes
                 </span>
               </div>
@@ -338,11 +338,11 @@ export const RotationView: React.FC<RotationViewProps> = ({ onOpenCollections, o
                       key={opt.value}
                       type="button"
                       onClick={() => handleIntervalChange(opt.value)}
-                      className={`p-2.5 rounded-xl text-left border text-xs font-medium transition-all cursor-pointer ${
+                      className={`p-2.5 rounded-xl text-left border text-xs font-semibold transition-all cursor-pointer ${
                         isSelected
                           ? isWhitish
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                            : 'bg-cyan-500/25 text-cyan-200 border-cyan-400/50 shadow-sm font-bold'
+                            ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
+                            : 'bg-white/20 text-white border-white/30 shadow-xs'
                           : isWhitish
                           ? 'bg-black/5 border-black/8 hover:bg-black/10 text-slate-700'
                           : 'bg-white/5 border-white/8 hover:bg-white/10 text-slate-300'
