@@ -13,6 +13,8 @@
     "build": "npm run build:frontend && electron-builder",
     "build:dir": "npm run build:frontend && electron-builder --dir",
     "build:dmg": "npm run build:frontend && electron-builder --mac dmg",
+    "build:mac": "npm run build:frontend && electron-builder --mac dmg",
+    "build:win": "npm run build:frontend && electron-builder --win nsis",
     "install:all": "npm install && npm --prefix frontend install",
     "rebuild": "electron-builder install-app-deps",
     "test": "node tests/step2.test.js && node tests/step3.test.js && node tests/discovery_integration.test.js && node tests/backend_driven_and_window_controls.test.js && node tests/frontend_refinement_and_personalization.test.js && node tests/ipc_channel_consistency.test.js",
@@ -39,9 +41,23 @@
     "mac": {
       "category": "public.app-category.lifestyle",
       "target": [
-        "dir"
+        "dmg",
+        "zip"
       ],
       "icon": "build/icon.png"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AuraDesk"
     }
   },
   "dependencies": {
