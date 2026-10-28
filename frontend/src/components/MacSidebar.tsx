@@ -204,12 +204,13 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
               >
                 {/* Smooth macOS Active Indicator Pill */}
                 <span
-                  className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full transition-all duration-200 ease-out ${isActive
+                  className={`absolute left-0 top-2 bottom-2 w-1 rounded-r-full transition-all duration-200 ease-out ${
+                    isActive
                       ? isWhitish
                         ? 'bg-indigo-600 opacity-100 scale-y-100'
                         : 'bg-cyan-400 opacity-100 scale-y-100'
                       : 'opacity-0 scale-y-0'
-                    }`}
+                  }`}
                 />
                 <div className="flex items-center gap-2.5 pl-1">
                   <Icon
@@ -245,10 +246,11 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
             <button
               type="button"
               onClick={() => onSelectTab('collections')}
-              className={`text-[10px] uppercase font-mono tracking-wider font-semibold transition-colors flex items-center gap-1 cursor-pointer ${isWhitish
+              className={`text-[10px] uppercase font-mono tracking-wider font-semibold transition-colors flex items-center gap-1 cursor-pointer ${
+                isWhitish
                   ? 'text-slate-500 hover:text-slate-900'
                   : 'text-slate-400 hover:text-white'
-                }`}
+              }`}
               title="Go to Collections Manager"
             >
               <span>Collections</span>
@@ -279,24 +281,26 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
                     setActiveCollectionId(col.id);
                     onSelectTab('collections');
                   }}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${isSelected
+                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all duration-200 ease-out text-left cursor-pointer active:scale-[0.98] ${
+                    isSelected
                       ? isWhitish
                         ? 'bg-white/95 text-slate-900 font-semibold shadow-xs border border-slate-200/80'
                         : 'bg-white/15 text-white font-semibold border border-white/20'
                       : isWhitish
-                        ? 'text-slate-600 hover:text-slate-900 hover:bg-white/40 border border-transparent'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
+                      ? 'text-slate-600 hover:text-slate-900 hover:bg-white/40 border border-transparent'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-white/5 border border-transparent'
                     }`}
                   title={`Open ${col.name} in Collections Manager`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     <span
-                      className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-200 ${isSelected
+                      className={`w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-200 ${
+                        isSelected
                           ? isWhitish
                             ? 'bg-indigo-600 scale-125'
                             : 'bg-cyan-400 scale-125'
                           : 'bg-slate-400 scale-100'
-                        }`}
+                      }`}
                     />
                     <span className="truncate">{col.name}</span>
                   </div>
