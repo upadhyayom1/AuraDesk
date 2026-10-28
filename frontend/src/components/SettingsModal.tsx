@@ -1,171 +1,139 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useWallpaper } from '../context/WallpaperContext';
 import {
   Sliders,
   X,
-  RotateCw,
   Shuffle,
   ShieldCheck,
   Monitor,
   Power,
   Clock,
   Sparkles,
+  MapPin,
+  Globe,
+  Check,
 } from 'lucide-react';
 import { ScalingMode } from '../types/wallpaper';
+import { electronBridge } from '../services/electronBridge';
 
 interface SettingsModalProps {
   onClose: () => void;
-  onOpenTeam: () => void;
 }
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onOpenTeam }) => {
+export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
   const { settings, updateSettings, scalingMode, setScalingMode, glassTheme, setGlassTheme } = useWallpaper();
 
+  const isWhitish = glassTheme === 'whitish';
+
+  const [cityInput, setCityInput] = useState<string>(settings.location?.city || '');
+  const [isSavingCity, setIsSavingCity] = useState(false);
+  const [citySavedNotice, setCitySavedNotice] = useState(false);
+
   const intervalOptions = [
-    { label: '1 minute (Demo)', value: 1 },
-    { label: '5 minutes', value: 5 },
-    { label: '15 minutes (Standard)', value: 15 },
+    { label: '15 minutes (Recommended)', value: 15 },
     { label: '30 minutes', value: 30 },
     { label: '1 hour', value: 60 },
     { label: '6 hours', value: 360 },
+    { label: '12 hours', value: 720 },
+    { label: '24 hours', value: 1440 },
+    { label: '1 minute (Fast Demo)', value: 1 },
   ];
+
+  const handleSaveCity = async () => {
+    if (!cityInput.trim()) return;
+    setIsSavingCity(true);
+    try {
+      await electronBridge.setWeatherLocation({ city: cityInput.trim() });
+      updateSettings({
+        location: {
+          ...settings.location,
+          city: cityInput.trim()
+        }
+      });
+      setCitySavedNotice(true);
+      setTimeout(() => setCitySavedNotice(false), 2500);
+    } catch (err) {
+      console.warn('[SettingsModal] Failed to set location:', err);
+    } finally {
+      setIsSavingCity(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
-      <div className="w-full max-w-lg mac-glass-panel-dark rounded-3xl p-6 border border-white/20 shadow-2xl space-y-5 animate-in fade-in zoom-in-95">
-        <div className="flex items-center justify-between">
+      <div
+        className={`w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-3xl p-6 shadow-2xl space-y-5 animate-in fade-in zoom-in-95 transition-all ${
+          isWhitish ? 'mac-modal-light border-black/10' : 'mac-modal-dark border-white/15'
+        }`}
+      >
+        {/* Header */}
+        <div className={`flex items-center justify-between pb-3 border-b ${isWhitish ? 'border-black/8' : 'border-white/10'}`}>
           <div className="flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-cyan-300" />
-            <h3 className="text-base font-bold text-white">AuraDesk Preferences</h3>
+            <Sliders className={`w-4 h-4 ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`} />
+            <h3 className={`text-base font-bold ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
+              AuraDesk Preferences
+            </h3>
           </div>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button
+            onClick={onClose}
+            className={`p-1 rounded-lg transition-colors ${
+              isWhitish ? 'text-slate-400 hover:text-slate-800 hover:bg-black/5' : 'text-slate-400 hover:text-white hover:bg-white/10'
+            }`}
+            aria-label="Close preferences"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="space-y-4 text-xs">
           {/* Glass Theme Aesthetic Selection */}
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-            <label className="text-slate-200 font-semibold flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-300" />
-              <span>Glassmorphism Style</span>
+          <div className={`p-3.5 rounded-2xl border space-y-2 ${isWhitish ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
+            <label className={`font-semibold flex items-center gap-2 ${isWhitish ? 'text-slate-800' : 'text-slate-200'}`}>
+              <Sparkles className={`w-3.5 h-3.5 ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`} />
+              <span>Appearance & Theme</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setGlassTheme('whitish')}
-                className={`p-2.5 rounded-xl text-left border transition-all text-xs font-medium ${
-                  glassTheme === 'whitish'
-                    ? 'bg-white text-slate-900 border-white shadow-sm'
-                    : 'bg-white/5 text-slate-300 border-white/10 hover:text-white'
-                }`}
-              >
-                <span className="font-bold block">Whitish Glass</span>
-                <span className="text-[10px] opacity-75 block">macOS Finder Frost (Ref 1)</span>
-              </button>
-
               <button
                 type="button"
                 onClick={() => setGlassTheme('blackish')}
-                className={`p-2.5 rounded-xl text-left border transition-all text-xs font-medium ${
-                  glassTheme === 'blackish'
-                    ? 'bg-neutral-800 text-white border-white/30 shadow-sm'
+                className={`p-2.5 rounded-xl text-left border transition-all text-xs font-medium cursor-pointer ${
+                  !isWhitish
+                    ? 'bg-neutral-800 text-white border-white/30 shadow-md ring-1 ring-cyan-400/30'
+                    : 'bg-white/40 text-slate-700 border-black/10 hover:bg-white/70'
+                }`}
+              >
+                <span className="font-bold block">Obsidian Dark</span>
+                <span className={`text-[10px] block ${!isWhitish ? 'text-slate-300' : 'text-slate-500'}`}>
+                  Deep charcoal dark surface
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setGlassTheme('whitish')}
+                className={`p-2.5 rounded-xl text-left border transition-all text-xs font-medium cursor-pointer ${
+                  isWhitish
+                    ? 'bg-white text-slate-900 border-white shadow-md ring-1 ring-blue-500/30'
                     : 'bg-white/5 text-slate-300 border-white/10 hover:text-white'
                 }`}
               >
-                <span className="font-bold block">Blackish Dark</span>
-                <span className="text-[10px] opacity-75 block">Obsidian Specular Glass (Ref 2)</span>
+                <span className="font-bold block">Frosted Light</span>
+                <span className={`text-[10px] block ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
+                  Clean light neutral surface
+                </span>
               </button>
             </div>
           </div>
 
-          {/* Rotation Interval */}
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-            <div className="flex items-center justify-between">
-              <label className="text-slate-200 font-semibold flex items-center gap-2">
-                <Clock className="w-3.5 h-3.5 text-cyan-300" />
-                <span>Rotation Interval</span>
-              </label>
-              <span className="font-mono text-cyan-300 text-xs">
-                {settings.rotationIntervalMinutes} min
-              </span>
-            </div>
-            <select
-              value={settings.rotationIntervalMinutes}
-              onChange={e =>
-                updateSettings({ rotationIntervalMinutes: Number(e.target.value) })
-              }
-              className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-white/15 text-white focus:outline-none"
-            >
-              {intervalOptions.map(opt => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Shuffle Mode */}
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
-            <div>
-              <label className="text-slate-200 font-semibold flex items-center gap-2">
-                <Shuffle className="w-3.5 h-3.5 text-cyan-300" />
-                <span>Shuffle Rotation</span>
-              </label>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Randomize wallpaper selection within the active collection
-              </p>
-            </div>
-            <button
-              onClick={() => updateSettings({ shuffleEnabled: !settings.shuffleEnabled })}
-              className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-                settings.shuffleEnabled ? 'bg-cyan-500' : 'bg-slate-700'
-              }`}
-            >
-              <div
-                className={`w-5 h-5 rounded-full bg-white transition-transform ${
-                  settings.shuffleEnabled ? 'translate-x-5' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Avoid Recent Wallpapers */}
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
-            <div>
-              <label className="text-slate-200 font-semibold flex items-center gap-2">
-                <ShieldCheck className="w-3.5 h-3.5 text-cyan-300" />
-                <span>Deduplicate Recent Wallpapers</span>
-              </label>
-              <p className="text-[11px] text-slate-400 mt-0.5">
-                Excludes the last {settings.recentHistoryLimit} applied wallpapers from rotation
-              </p>
-            </div>
-            <button
-              onClick={() =>
-                updateSettings({ avoidRecentWallpapers: !settings.avoidRecentWallpapers })
-              }
-              className={`w-11 h-6 rounded-full transition-colors relative p-0.5 ${
-                settings.avoidRecentWallpapers ? 'bg-cyan-500' : 'bg-slate-700'
-              }`}
-            >
-              <div
-                className={`w-5 h-5 rounded-full bg-white transition-transform ${
-                  settings.avoidRecentWallpapers ? 'translate-x-5' : 'translate-x-0'
-                }`}
-              />
-            </button>
-          </div>
-
-          {/* Default Desktop Scaling Mode */}
-          <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-            <label className="text-slate-200 font-semibold flex items-center gap-2">
-              <Monitor className="w-3.5 h-3.5 text-cyan-300" />
-              <span>Default Scaling Engine</span>
+          {/* Default Scaling Engine */}
+          <div className={`p-3.5 rounded-2xl border space-y-2 ${isWhitish ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
+            <label className={`font-semibold flex items-center gap-2 ${isWhitish ? 'text-slate-800' : 'text-slate-200'}`}>
+              <Monitor className={`w-3.5 h-3.5 ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`} />
+              <span>Sharp Scaling & Cropping Engine</span>
             </label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { mode: 'fill', label: 'Fill Screen' },
+                { mode: 'fill', label: 'Cover / Scale' },
                 { mode: 'fit-blur', label: 'Fit with Blur Bleed' },
                 { mode: 'center', label: 'Center Crop' },
                 { mode: 'stretch', label: 'Stretch' },
@@ -174,10 +142,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onOpenTea
                   key={opt.mode}
                   type="button"
                   onClick={() => setScalingMode(opt.mode as ScalingMode)}
-                  className={`p-2 rounded-xl text-left border transition-all text-xs font-medium ${
+                  className={`p-2 rounded-xl text-left border transition-all text-xs font-medium cursor-pointer ${
                     scalingMode === opt.mode
-                      ? 'bg-cyan-500/20 text-cyan-200 border-cyan-400/40'
-                      : 'bg-white/5 text-slate-400 border-white/5 hover:text-white'
+                      ? isWhitish
+                        ? 'bg-blue-500/15 text-blue-900 border-blue-400/40 font-semibold'
+                        : 'bg-cyan-500/20 text-cyan-200 border-cyan-400/40 font-semibold'
+                      : isWhitish
+                      ? 'bg-white/40 text-slate-600 border-black/8 hover:text-slate-900'
+                      : 'bg-white/5 text-slate-400 border-white/8 hover:text-white'
                   }`}
                 >
                   {opt.label}
@@ -185,22 +157,91 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose, onOpenTea
               ))}
             </div>
           </div>
+
+          {/* Weather Location Settings */}
+          <div className={`p-3.5 rounded-2xl border space-y-2 ${isWhitish ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
+            <div className="flex items-center justify-between">
+              <label className={`font-semibold flex items-center gap-2 ${isWhitish ? 'text-slate-800' : 'text-slate-200'}`}>
+                <MapPin className={`w-3.5 h-3.5 ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`} />
+                <span>Weather Telemetry City</span>
+              </label>
+              {citySavedNotice && (
+                <span className="text-[10px] text-emerald-500 font-medium flex items-center gap-1">
+                  <Check className="w-3 h-3" /> Saved
+                </span>
+              )}
+            </div>
+            <p className={`text-[11px] ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
+              Enter your city to feed weather-based context rules (OpenWeatherMap)
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={cityInput}
+                onChange={e => setCityInput(e.target.value)}
+                placeholder="e.g. San Francisco, Tokyo, London"
+                className={`flex-1 px-3 py-2 rounded-xl border text-xs focus:outline-none transition-all ${
+                  isWhitish
+                    ? 'bg-white border-black/15 text-slate-900 focus:border-indigo-600'
+                    : 'bg-black/30 border-white/15 text-white focus:border-cyan-400'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={handleSaveCity}
+                disabled={isSavingCity || !cityInput.trim()}
+                className={`px-3 py-2 rounded-xl font-medium transition-all text-xs cursor-pointer disabled:opacity-50 ${
+                  isWhitish
+                    ? 'bg-slate-900 text-white hover:bg-slate-800'
+                    : 'bg-white/15 hover:bg-white/25 text-white'
+                }`}
+              >
+                {isSavingCity ? 'Saving...' : 'Update'}
+              </button>
+            </div>
+          </div>
+
+          {/* Launch on Startup */}
+          <div className={`p-3.5 rounded-2xl border flex items-center justify-between ${isWhitish ? 'bg-black/5 border-black/10' : 'bg-white/5 border-white/10'}`}>
+            <div>
+              <label className={`font-semibold flex items-center gap-2 ${isWhitish ? 'text-slate-800' : 'text-slate-200'}`}>
+                <Power className={`w-3.5 h-3.5 ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`} />
+                <span>Launch on System Login</span>
+              </label>
+              <p className={`text-[11px] mt-0.5 ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
+                Automatically start AuraDesk minimized to menu bar on login
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                const nextVal = !settings.launchOnStartup;
+                updateSettings({ launchOnStartup: nextVal });
+                electronBridge.saveSettings({ launchOnStartup: nextVal }).catch(console.warn);
+              }}
+              className={`w-11 h-6 rounded-full transition-colors relative p-0.5 cursor-pointer ${
+                settings.launchOnStartup ? (isWhitish ? 'bg-indigo-600' : 'bg-cyan-500') : (isWhitish ? 'bg-slate-300' : 'bg-slate-700')
+              }`}
+              aria-label="Toggle launch on login"
+            >
+              <div
+                className={`w-5 h-5 rounded-full bg-white transition-transform ${
+                  settings.launchOnStartup ? 'translate-x-5' : 'translate-x-0'
+                }`}
+              />
+            </button>
+          </div>
         </div>
 
-        <div className="pt-2 border-t border-white/10 flex items-center justify-between">
-          <button
-            onClick={() => {
-              onClose();
-              onOpenTeam();
-            }}
-            className="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1.5"
-          >
-            <span>Softablitz 2026 Team Info →</span>
-          </button>
-
+        {/* Footer */}
+        <div className={`pt-3 border-t flex items-center justify-end ${isWhitish ? 'border-black/8' : 'border-white/10'}`}>
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 text-white font-medium text-xs transition-all"
+            className={`px-5 py-2 rounded-xl font-medium text-xs transition-all cursor-pointer ${
+              isWhitish
+                ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-sm'
+                : 'bg-white/20 hover:bg-white/30 text-white shadow-sm'
+            }`}
           >
             Done
           </button>

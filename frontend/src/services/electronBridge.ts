@@ -760,6 +760,291 @@ export const electronBridge = {
   },
 
   // ==========================================
+  // CONTEXT-AWARE PERSONALIZATION & RULES
+  // ==========================================
+
+  /**
+   * Retrieves current personalization state (enabled, activeRule, override, context snapshot)
+   */
+  async getPersonalizationState(): Promise<{ enabled: boolean; activeRule: any; override: any; context: any } | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('personalization:getState');
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to get personalization state:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Toggles the master context-aware auto-adaptation switch
+   */
+  async setPersonalizationEnabled(enabled: boolean): Promise<boolean> {
+    if (!isElectron()) return enabled;
+    try {
+      const res = await window.api!.invoke('personalization:setEnabled', { enabled });
+      return Boolean(res?.data?.enabled);
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to set personalization enabled:', err);
+      return false;
+    }
+  },
+
+  /**
+   * Lists all persisted personalization rules from SQLite
+   */
+  async listRules(): Promise<any[]> {
+    if (!isElectron()) return [];
+    try {
+      const res = await window.api!.invoke('rule:list');
+      return res?.data || [];
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to list rules:', err);
+      return [];
+    }
+  },
+
+  /**
+   * Creates a new personalization rule
+   */
+  async createRule(rule: {
+    name: string;
+    conditionType: 'TIME_RANGE' | 'WEATHER' | 'DAY_PART';
+    conditionValue: string | Record<string, any>;
+    collectionId: string;
+    priority?: number;
+  }): Promise<any | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('rule:create', rule);
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to create rule:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Updates an existing personalization rule
+   */
+  async updateRule(id: string, patch: any): Promise<any | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('rule:update', { id, patch });
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to update rule:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Deletes a personalization rule
+   */
+  async deleteRule(id: string): Promise<boolean> {
+    if (!isElectron()) return false;
+    try {
+      const res = await window.api!.invoke('rule:delete', { id });
+      return Boolean(res?.data?.ok);
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to delete rule:', err);
+      return false;
+    }
+  },
+
+  /**
+   * Reorders rules by priority
+   */
+  async reorderRules(ruleIds: string[]): Promise<boolean> {
+    if (!isElectron()) return false;
+    try {
+      const res = await window.api!.invoke('rule:reorder', { ruleIds });
+      return Boolean(res?.data?.ok);
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to reorder rules:', err);
+      return false;
+    }
+  },
+
+  /**
+   * Dry-run rule evaluation against current context
+   */
+  async evaluatePersonalization(): Promise<any | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('personalization:evaluate');
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to evaluate personalization:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Sets manual wallpaper override
+   */
+  async setOverride(wallpaperId: string, durationMinutes = 120): Promise<any | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('override:set', { wallpaperId, durationMinutes });
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to set override:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Clears active manual override so rules & rotation resume
+   */
+  async clearOverride(): Promise<boolean> {
+    if (!isElectron()) return true;
+    try {
+      const res = await window.api!.invoke('override:clear');
+      return Boolean(res?.data?.ok);
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to clear override:', err);
+      return false;
+    }
+  },
+
+  // ==========================================
+  // CALENDAR & WEATHER INTEGRATION
+  // ==========================================
+
+  /**
+   * Gets Google Calendar connection status
+   */
+  async getCalendarStatus(): Promise<{ connected: boolean; account: string | null; lastSyncAt: string | null }> {
+    if (!isElectron()) return { connected: false, account: null, lastSyncAt: null };
+    try {
+      const res = await window.api!.invoke('calendar:status');
+      return res?.data || { connected: false, account: null, lastSyncAt: null };
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to get calendar status:', err);
+      return { connected: false, account: null, lastSyncAt: null };
+    }
+  },
+
+  /**
+   * Initiates Google Calendar OAuth connection loopback
+   */
+  async connectCalendar(): Promise<any> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('calendar:connect');
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to connect calendar:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Disconnects Google Calendar account
+   */
+  async disconnectCalendar(): Promise<boolean> {
+    if (!isElectron()) return true;
+    try {
+      const res = await window.api!.invoke('calendar:disconnect');
+      return Boolean(res?.data?.ok);
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to disconnect calendar:', err);
+      return false;
+    }
+  },
+
+  /**
+   * Retrieves upcoming calendar events
+   */
+  async getUpcomingCalendarEvents(hours = 24): Promise<any[]> {
+    if (!isElectron()) return [];
+    try {
+      const res = await window.api!.invoke('calendar:upcoming', { hours });
+      return res?.data || [];
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to get upcoming events:', err);
+      return [];
+    }
+  },
+
+  /**
+   * Lists calendar event bindings (keyword -> collection)
+   */
+  async listCalendarBindings(): Promise<any[]> {
+    if (!isElectron()) return [];
+    try {
+      const res = await window.api!.invoke('calendar:binding:list');
+      return res?.data || [];
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to list calendar bindings:', err);
+      return [];
+    }
+  },
+
+  /**
+   * Creates a calendar keyword binding
+   */
+  async createCalendarBinding(binding: {
+    matchType: 'KEYWORD' | 'EVENT_ID';
+    matchValue: string;
+    collectionId: string;
+    priority?: number;
+  }): Promise<any | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('calendar:binding:create', binding);
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to create calendar binding:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Deletes a calendar binding
+   */
+  async deleteCalendarBinding(id: string): Promise<boolean> {
+    if (!isElectron()) return false;
+    try {
+      const res = await window.api!.invoke('calendar:binding:delete', { id });
+      return Boolean(res?.data?.ok);
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to delete calendar binding:', err);
+      return false;
+    }
+  },
+
+  /**
+   * Gets current live or cached weather telemetry
+   */
+  async getCurrentWeather(): Promise<any | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('weather:current');
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to get weather:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Sets weather location (city or lat/lon)
+   */
+  async setWeatherLocation(location: { city?: string; lat?: number; lon?: number }): Promise<any | null> {
+    if (!isElectron()) return null;
+    try {
+      const res = await window.api!.invoke('weather:setLocation', location);
+      return res?.data || null;
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to set weather location:', err);
+      return null;
+    }
+  },
+
+  // ==========================================
   // PUSH EVENT SUBSCRIPTIONS
   // ==========================================
 
@@ -785,6 +1070,19 @@ export const electronBridge = {
       return window.api!.on('rotation:state', callback);
     } catch (err) {
       console.warn('[AuraDesk Bridge] Failed to listen to rotation:state:', err);
+      return undefined;
+    }
+  },
+
+  /**
+   * Subscribes to personalization engine state broadcasts
+   */
+  onPersonalizationState(callback: (state: any) => void): (() => void) | undefined {
+    if (!isElectron()) return undefined;
+    try {
+      return window.api!.on('personalization:state', callback);
+    } catch (err) {
+      console.warn('[AuraDesk Bridge] Failed to listen to personalization:state:', err);
       return undefined;
     }
   },

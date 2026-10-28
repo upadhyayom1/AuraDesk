@@ -1,4 +1,4 @@
-// AuraDesk Core Domain Models (Softablitz 2026 Reference)
+// AuraDesk Core Domain Models
 
 export type WallpaperSourceType = 'unsplash' | 'pexels' | 'local';
 

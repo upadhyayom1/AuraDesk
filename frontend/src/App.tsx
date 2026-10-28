@@ -5,8 +5,9 @@ import { MacTrayMenu } from './components/MacTrayMenu';
 import { WallpaperDiscovery } from './components/WallpaperDiscovery';
 import { CollectionsView } from './components/CollectionsView';
 import { HistoryTrayView } from './components/HistoryTrayView';
+import { RotationView } from './components/RotationView';
+import { PersonalizationView } from './components/PersonalizationView';
 import { SettingsModal } from './components/SettingsModal';
-import { TeamInfoModal } from './components/TeamInfoModal';
 import { AddCustomWallpaperModal } from './components/AddCustomWallpaperModal';
 import { Sun, Moon } from 'lucide-react';
 
@@ -22,9 +23,7 @@ const AuraDeskApp: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('discovery');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [isAddCustomOpen, setIsAddCustomOpen] = useState(false);
-  const [isWindowMinimized, setIsWindowMinimized] = useState(false);
 
   const isWhitish = glassTheme === 'whitish';
 
@@ -60,7 +59,6 @@ const AuraDeskApp: React.FC = () => {
         onSelectTab={setActiveTab}
         onOpenNewWallpaperModal={() => setIsAddCustomOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
-        onOpenTeam={() => setIsTeamModalOpen(true)}
       />
 
       {/* Edge-to-Edge Right Main Content Viewport */}
@@ -81,6 +79,8 @@ const AuraDeskApp: React.FC = () => {
             <span className={`font-semibold capitalize text-sm tracking-wide ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
               {activeTab === 'discovery' && 'Explore 5K & 4K Wallpapers'}
               {activeTab === 'collections' && 'Collection Manager & Playlists'}
+              {activeTab === 'rotation' && 'Automatic Wallpaper Rotation'}
+              {activeTab === 'personalization' && 'Context-Aware Personalization'}
               {activeTab === 'history' && 'Rotation History & Instant Rollback'}
             </span>
           </div>
@@ -110,12 +110,6 @@ const AuraDeskApp: React.FC = () => {
                 </>
               )}
             </button>
-
-            <span className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full border ${
-              isWhitish ? 'border-slate-300 text-slate-600 bg-white/60' : 'border-white/15 text-slate-400 bg-white/5'
-            }`}>
-              AuraDesk · Softablitz 2026 Team 220
-            </span>
           </div>
         </header>
 
@@ -129,6 +123,17 @@ const AuraDeskApp: React.FC = () => {
           {activeTab === 'collections' && (
             <CollectionsView onOpenAddCustom={() => setIsAddCustomOpen(true)} />
           )}
+          {activeTab === 'rotation' && (
+            <RotationView
+              onOpenCollections={() => setActiveTab('collections')}
+              onOpenHistory={() => setActiveTab('history')}
+            />
+          )}
+          {activeTab === 'personalization' && (
+            <PersonalizationView
+              onOpenCollections={() => setActiveTab('collections')}
+            />
+          )}
           {activeTab === 'history' && <HistoryTrayView />}
         </div>
       </div>
@@ -137,14 +142,8 @@ const AuraDeskApp: React.FC = () => {
       {isSettingsOpen && (
         <SettingsModal
           onClose={() => setIsSettingsOpen(false)}
-          onOpenTeam={() => {
-            setIsSettingsOpen(false);
-            setIsTeamModalOpen(true);
-          }}
         />
       )}
-
-      {isTeamModalOpen && <TeamInfoModal onClose={() => setIsTeamModalOpen(false)} />}
 
       {isAddCustomOpen && (
         <AddCustomWallpaperModal onClose={() => setIsAddCustomOpen(false)} />

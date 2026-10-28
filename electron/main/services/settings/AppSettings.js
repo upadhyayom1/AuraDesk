@@ -15,7 +15,9 @@ const DEFAULT_SETTINGS = {
   sourcesEnabled: {
     unsplash: true,
     pexels: true
-  }
+  },
+  glassTheme: 'blackish',
+  darkMode: true
 };
 
 class AppSettings {
@@ -57,7 +59,9 @@ class AppSettings {
         sourcesEnabled: {
           ...DEFAULT_SETTINGS.sourcesEnabled,
           ...(persisted.sourcesEnabled || {})
-        }
+        },
+        glassTheme: persisted.glassTheme === 'whitish' ? 'whitish' : 'blackish',
+        darkMode: typeof persisted.darkMode === 'boolean' ? persisted.darkMode : true
       };
 
       // Sync launchOnStartup with OS if app is ready
@@ -148,6 +152,16 @@ class AppSettings {
         ...validatedPatch.sourcesEnabled
       };
       dbUpdates.sourcesEnabled = nextSettings.sourcesEnabled;
+    }
+
+    if (validatedPatch.glassTheme !== undefined) {
+      nextSettings.glassTheme = validatedPatch.glassTheme;
+      dbUpdates.glassTheme = validatedPatch.glassTheme;
+    }
+
+    if (validatedPatch.darkMode !== undefined) {
+      nextSettings.darkMode = validatedPatch.darkMode;
+      dbUpdates.darkMode = validatedPatch.darkMode;
     }
 
     // 3. Persist to SQLite in a single transaction

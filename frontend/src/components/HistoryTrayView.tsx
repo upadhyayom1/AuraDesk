@@ -24,26 +24,35 @@ export const HistoryTrayView: React.FC = () => {
 
   const isWhitish = glassTheme === 'whitish';
 
+  const formatAppliedAt = (dateStr: string) => {
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    } catch {
+      return dateStr;
+    }
+  };
+
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 max-w-5xl mx-auto">
       {/* Top Banner */}
       <div
-        className={`flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 rounded-2xl border shrink-0 transition-all ${
+        className={`flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-5 rounded-3xl border shrink-0 transition-all ${
           isWhitish
             ? 'mac-glass-whitish-card border-white/80 text-slate-800'
-            : 'mac-glass-blackish-card border-white/18 text-slate-100 specular-sheen'
+            : 'mac-glass-blackish-card border-white/15 text-slate-100 specular-sheen'
         }`}
       >
         <div>
           <div className="flex items-center gap-2">
-            <History className={`w-5 h-5 ${isWhitish ? 'text-blue-600' : 'text-cyan-300'}`} />
+            <History className={`w-5 h-5 ${isWhitish ? 'text-indigo-600' : 'text-cyan-300'}`} />
             <h2 className={`text-base font-bold tracking-wide ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
-              Persistent Rotation History & Rollback
+              Rotation History & Instant Rollback
             </h2>
           </div>
           <p className={`text-xs mt-0.5 ${isWhitish ? 'text-slate-600' : 'text-slate-400'}`}>
-            Audit chronological wallpaper changes. Rollback to any prior wallpaper with a single click
-            while maintaining deduplication.
+            Audit chronological wallpaper changes from SQLite. Rollback to any prior wallpaper with a single click.
           </p>
         </div>
 
@@ -53,13 +62,13 @@ export const HistoryTrayView: React.FC = () => {
             onClick={() =>
               updateSettings({ avoidRecentWallpapers: !settings.avoidRecentWallpapers })
             }
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all cursor-pointer ${
               settings.avoidRecentWallpapers
                 ? isWhitish
-                  ? 'bg-blue-500/15 text-blue-900 border-blue-400/30'
+                  ? 'bg-cyan-50 text-cyan-800 border-cyan-300'
                   : 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30'
                 : isWhitish
-                ? 'bg-white/50 text-slate-600 border-white/80'
+                ? 'bg-white/60 text-slate-600 border-slate-300'
                 : 'bg-white/5 text-slate-400 border-white/10'
             }`}
             title="When active, the rotation scheduler avoids repeating recently used wallpapers"
@@ -73,7 +82,11 @@ export const HistoryTrayView: React.FC = () => {
           {history.length > 0 && (
             <button
               onClick={clearHistory}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-rose-500/20 hover:text-rose-300 text-slate-400 text-xs font-medium border border-white/10 transition-colors"
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
+                isWhitish
+                  ? 'bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100'
+                  : 'bg-white/5 hover:bg-rose-500/20 hover:text-rose-300 text-slate-400 border-white/10'
+              }`}
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>Clear History</span>
@@ -84,10 +97,17 @@ export const HistoryTrayView: React.FC = () => {
 
       {/* History Timeline */}
       {history.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl mac-glass-panel-dark border border-white/10 space-y-2">
-          <p className="text-sm font-semibold text-white">No history entries yet</p>
-          <p className="text-xs text-slate-400">
-            As wallpapers are rotated or applied, they will appear here for easy rollback.
+        <div
+          className={`p-12 text-center rounded-3xl border space-y-2 ${
+            isWhitish
+              ? 'bg-white/60 border-slate-200 text-slate-700'
+              : 'bg-white/5 border-white/10 text-slate-300'
+          }`}
+        >
+          <History className="w-8 h-8 mx-auto mb-1 opacity-50 text-slate-400" />
+          <p className="text-sm font-semibold">No rotation history yet</p>
+          <p className="text-xs opacity-75 max-w-sm mx-auto">
+            As wallpapers are rotated or applied to the desktop, they will appear here for audit and instant rollback.
           </p>
         </div>
       ) : (
@@ -98,49 +118,69 @@ export const HistoryTrayView: React.FC = () => {
             const getReasonBadge = (reason: string) => {
               switch (reason) {
                 case 'calendar':
-                  return 'bg-purple-500/20 text-purple-300 border-purple-400/30';
+                  return isWhitish
+                    ? 'bg-purple-100 text-purple-800 border-purple-200'
+                    : 'bg-purple-500/20 text-purple-300 border-purple-400/30';
                 case 'weather':
-                  return 'bg-sky-500/20 text-sky-300 border-sky-400/30';
+                  return isWhitish
+                    ? 'bg-sky-100 text-sky-800 border-sky-200'
+                    : 'bg-sky-500/20 text-sky-300 border-sky-400/30';
                 case 'time':
-                  return 'bg-amber-500/20 text-amber-300 border-amber-400/30';
+                  return isWhitish
+                    ? 'bg-amber-100 text-amber-800 border-amber-200'
+                    : 'bg-amber-500/20 text-amber-300 border-amber-400/30';
                 case 'scheduler':
-                  return 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30';
+                  return isWhitish
+                    ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                    : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30';
                 case 'manual':
                 default:
-                  return 'bg-white/10 text-slate-300 border-white/15';
+                  return isWhitish
+                    ? 'bg-slate-100 text-slate-700 border-slate-200'
+                    : 'bg-white/10 text-slate-300 border-white/15';
               }
             };
 
             return (
               <div
                 key={entry.id}
-                className={`p-3.5 rounded-2xl mac-glass-card flex items-center justify-between gap-4 transition-all ${
-                  isCurrent ? 'ring-1 ring-cyan-400/50 bg-cyan-950/20' : ''
+                className={`p-3.5 rounded-2xl border flex items-center justify-between gap-4 transition-all ${
+                  isCurrent
+                    ? isWhitish
+                      ? 'bg-white border-cyan-400/80 shadow-md ring-2 ring-cyan-500/20'
+                      : 'bg-cyan-950/20 border-cyan-400/50 ring-1 ring-cyan-400/30'
+                    : isWhitish
+                    ? 'bg-white/70 border-white/90 text-slate-800 shadow-xs hover:border-slate-300'
+                    : 'mac-glass-card border-white/10 text-slate-200 hover:border-white/20'
                 }`}
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   <img
                     src={entry.imageUrl}
                     alt={entry.wallpaperTitle}
-                    className="w-14 h-14 rounded-xl object-cover border border-white/15 shrink-0 shadow-md"
+                    className="w-14 h-14 rounded-xl object-cover border border-white/20 shrink-0 shadow-xs"
                   />
 
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h4 className="text-sm font-semibold text-white truncate">
+                      <h4 className={`text-sm font-semibold truncate ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
                         {entry.wallpaperTitle}
                       </h4>
                       {isCurrent && (
-                        <span className="px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 text-[10px] font-mono border border-cyan-400/30">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono border ${
+                          isWhitish
+                            ? 'bg-cyan-500/15 text-cyan-800 border-cyan-400/30'
+                            : 'bg-cyan-500/20 text-cyan-300 border-cyan-400/30'
+                        }`}>
                           Current
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
-                      <span>{entry.sourceCredit}</span>
+                    <div className="flex items-center gap-2 text-xs mt-1 flex-wrap opacity-80">
+                      <span className="truncate">{entry.sourceCredit}</span>
                       <span>·</span>
-                      <span className="font-mono tabular-nums text-slate-400">{entry.appliedAt}</span>
+                      <span className="font-mono tabular-nums">{formatAppliedAt(entry.appliedAt)}</span>
                       <span>·</span>
                       <span
                         className={`px-2 py-0.5 rounded-md border text-[10px] uppercase font-mono tracking-wider ${getReasonBadge(
@@ -156,10 +196,14 @@ export const HistoryTrayView: React.FC = () => {
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => rollbackHistory(entry.id)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-medium border border-white/15 transition-all active:scale-95 shadow-sm"
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all active:scale-95 shadow-xs cursor-pointer ${
+                      isWhitish
+                        ? 'bg-slate-900 hover:bg-slate-800 text-white border-transparent'
+                        : 'bg-white/10 hover:bg-white/20 text-white border-white/15'
+                    }`}
                     title="Rollback to this wallpaper"
                   >
-                    <RotateCcw className="w-3.5 h-3.5 text-cyan-300" />
+                    <RotateCcw className={`w-3.5 h-3.5 ${isWhitish ? 'text-cyan-300' : 'text-cyan-300'}`} />
                     <span>Reapply</span>
                   </button>
                 </div>

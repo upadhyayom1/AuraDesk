@@ -92,7 +92,7 @@ class PersonalizationEngine {
   }
 
   /**
-   * Convenience toggle for mock calendar event (e.g. 'Softablitz Final Exam')
+   * Convenience toggle for mock calendar event (e.g. 'Team Product Review')
    * @param {string|Object} eventOrSummary
    * @returns {Object|null} current mock context
    */

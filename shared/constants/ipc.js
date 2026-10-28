@@ -1,4 +1,4 @@
-// AuraDesk Internal IPC Channels (from Softablitz specification Part 3)
+// AuraDesk Internal IPC Channels
 export const IPC_CHANNELS = {
   // Discovery
   DISCOVERY_SEARCH: 'discovery:search',

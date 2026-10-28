@@ -102,13 +102,13 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
   };
 
   return (
-    <div className="space-y-6 pb-8">
+    <div className="space-y-6 pb-8 max-w-6xl mx-auto">
       {/* Top Banner & Header */}
       <div
-        className={`flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-4 rounded-2xl border shrink-0 transition-all ${
+        className={`flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-5 rounded-3xl border shrink-0 transition-all ${
           isWhitish
             ? 'mac-glass-whitish-card border-white/80 text-slate-800'
-            : 'mac-glass-blackish-card border-white/18 text-slate-100 specular-sheen'
+            : 'mac-glass-blackish-card border-white/15 text-slate-100 specular-sheen'
         }`}
       >
         <div>
@@ -123,7 +123,11 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
 
         <button
           onClick={() => setIsCreatingNew(true)}
-          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/30 text-xs font-medium transition-all shadow-sm active:scale-95 whitespace-nowrap cursor-pointer"
+          className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all shadow-sm active:scale-95 whitespace-nowrap cursor-pointer ${
+            isWhitish
+              ? 'bg-slate-900 hover:bg-slate-800 text-white'
+              : 'bg-white/15 hover:bg-white/20 text-white border border-white/20'
+          }`}
         >
           <Plus className="w-3.5 h-3.5" />
           <span>New Collection</span>
@@ -132,15 +136,21 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
 
       {/* Collection Cards Row */}
       {collections.length === 0 ? (
-        <div className="p-10 text-center rounded-2xl mac-glass-panel-dark border border-white/10 space-y-3">
-          <FolderOpen className="w-10 h-10 text-slate-500 mx-auto" />
-          <p className="text-sm font-semibold text-white">No collections found in local database</p>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+        <div
+          className={`p-10 text-center rounded-3xl border space-y-3 ${
+            isWhitish
+              ? 'bg-white/60 border-slate-200 text-slate-700'
+              : 'bg-white/5 border-white/10 text-slate-300'
+          }`}
+        >
+          <FolderOpen className="w-10 h-10 text-slate-400 mx-auto opacity-70" />
+          <p className="text-sm font-semibold">No collections found in local database</p>
+          <p className="text-xs opacity-75 max-w-sm mx-auto">
             Create your first collection to group wallpapers together and enable background rotation.
           </p>
           <button
             onClick={() => setIsCreatingNew(true)}
-            className="px-4 py-2 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/30 text-xs font-medium transition-all cursor-pointer"
+            className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-medium transition-all cursor-pointer"
           >
             Create First Collection
           </button>
@@ -157,10 +167,10 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
                 className={`p-4 rounded-2xl cursor-pointer transition-all duration-200 flex flex-col justify-between space-y-3 border ${
                   isSelected
                     ? isWhitish
-                      ? 'bg-white/90 border-white shadow-lg text-slate-900 ring-2 ring-blue-500/50'
+                      ? 'bg-white border-cyan-400/80 shadow-md text-slate-900 ring-2 ring-cyan-500/30'
                       : 'bg-white/15 border-white/30 shadow-xl text-white ring-1 ring-cyan-400/50'
                     : isWhitish
-                    ? 'mac-glass-whitish-card border-white/60 text-slate-800 hover:bg-white/70'
+                    ? 'mac-glass-whitish-card border-white/60 text-slate-800 hover:bg-white/80'
                     : 'mac-glass-blackish-card border-white/15 text-slate-200 hover:bg-white/10'
                 }`}
               >
@@ -171,9 +181,9 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
                         {col.name}
                       </h3>
                       {isActiveRotation && (
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono whitespace-nowrap border ${
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono whitespace-nowrap border ${
                           isWhitish
-                            ? 'bg-blue-500/15 border-blue-400/30 text-blue-900 font-bold'
+                            ? 'bg-cyan-500/15 border-cyan-400/30 text-cyan-800 font-bold'
                             : 'bg-cyan-500/25 border-cyan-400/30 text-cyan-300'
                         }`}>
                           Active Loop
@@ -181,13 +191,13 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
                       )}
                     </div>
                     <p className={`text-xs line-clamp-2 mt-1 ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
-                      {col.description}
+                      {col.description || 'Custom collection'}
                     </p>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
-                  <span className="font-mono text-slate-400 text-[11px] tabular-nums">
+                <div className={`pt-2 border-t flex items-center justify-between text-xs ${isWhitish ? 'border-black/5' : 'border-white/10'}`}>
+                  <span className={`font-mono text-[11px] tabular-nums ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
                     {col.wallpaperIds.length} wallpapers
                   </span>
 
@@ -195,14 +205,18 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
                     {!isActiveRotation && (
                       <button
                         onClick={() => setActiveCollectionId(col.id)}
-                        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-medium border border-white/15 transition-all cursor-pointer"
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-all cursor-pointer ${
+                          isWhitish
+                            ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-200'
+                            : 'bg-white/10 hover:bg-white/20 text-white border-white/15'
+                        }`}
                       >
                         Set Active
                       </button>
                     )}
                     <button
                       onClick={() => handleDelete(col.id)}
-                      className="p-1 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                      className="p-1 rounded-lg text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
                       title="Delete Collection"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -217,17 +231,17 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
 
       {/* Selected Collection Detailed View */}
       {selectedCol && (
-        <div className="space-y-4">
+        <div className="space-y-4 pt-2">
           <div className="flex items-center justify-between px-1 flex-wrap gap-2">
             <h3 className={`text-sm font-semibold tracking-wide ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
-              Wallpapers in "{selectedCol.name}" ({collectionWallpapers.length})
+              Wallpapers in &quot;{selectedCol.name}&quot; ({collectionWallpapers.length})
             </h3>
             <div className="flex items-center gap-2">
               {collectionWallpapers.length > 0 && (
                 <>
                   <button
                     onClick={() => applyCollection(selectedCol.id, 'next')}
-                    className="px-2.5 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-200 border border-cyan-400/30 text-xs font-medium transition-all flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-medium transition-all flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer"
                     title="Apply next wallpaper from this collection directly to your desktop"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
@@ -235,7 +249,11 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
                   </button>
                   <button
                     onClick={() => exportCollection(selectedCol.id)}
-                    className="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10 text-xs font-medium transition-all shadow-xs active:scale-95 cursor-pointer"
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all shadow-xs active:scale-95 cursor-pointer border ${
+                      isWhitish
+                        ? 'bg-white hover:bg-slate-50 text-slate-700 border-slate-300'
+                        : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10'
+                    }`}
                     title="Export collection vault to JSON file"
                   >
                     Export Vault
@@ -244,7 +262,7 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
               )}
               <button
                 onClick={onOpenAddCustom}
-                className="text-xs text-cyan-300 hover:text-cyan-200 transition-colors flex items-center gap-1 cursor-pointer"
+                className="text-xs text-cyan-600 dark:text-cyan-400 hover:underline transition-colors flex items-center gap-1 cursor-pointer font-medium"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Add Custom Image</span>
@@ -258,10 +276,16 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
               <span>Loading collection wallpapers from database...</span>
             </div>
           ) : collectionWallpapers.length === 0 ? (
-            <div className="p-8 text-center rounded-2xl mac-glass-panel-dark border border-white/10 space-y-2">
-              <p className="text-sm text-slate-300">This collection is currently empty.</p>
-              <p className="text-xs text-slate-400">
-                Go to the Explore tab and click "Collections" on any wallpaper to add it here.
+            <div
+              className={`p-8 text-center rounded-2xl border space-y-2 ${
+                isWhitish
+                  ? 'bg-white/60 border-slate-200 text-slate-700'
+                  : 'bg-white/5 border-white/10 text-slate-300'
+              }`}
+            >
+              <p className="text-sm font-semibold">This collection is currently empty.</p>
+              <p className="text-xs opacity-75">
+                Go to the Explore tab and click &quot;Add to Collection&quot; on any wallpaper to add it here.
               </p>
             </div>
           ) : (
@@ -271,7 +295,11 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
                 return (
                   <div
                     key={wall.id}
-                    className="relative rounded-2xl overflow-hidden mac-glass-card group border border-white/10 space-y-2 p-3 flex flex-col justify-between"
+                    className={`relative rounded-2xl overflow-hidden group border space-y-2 p-3 flex flex-col justify-between transition-all ${
+                      isWhitish
+                        ? 'bg-white/80 border-slate-200/90 text-slate-900 shadow-xs hover:border-slate-300'
+                        : 'mac-glass-card border-white/10 text-white hover:border-white/20'
+                    }`}
                   >
                     <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900">
                       <img
@@ -280,28 +308,36 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                       {isCurrent && (
-                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-500/90 text-[10px] font-bold text-white shadow-md">
+                        <div className="absolute top-2 right-2 px-2 py-0.5 rounded-md bg-emerald-500/95 text-[10px] font-bold text-white shadow-md">
                           Active Desktop
                         </div>
                       )}
                     </div>
 
                     <div>
-                      <h4 className="text-xs font-semibold text-white truncate">{wall.title}</h4>
-                      <p className="text-[11px] text-slate-400 truncate">{wall.sourceCredit || wall.photographer}</p>
+                      <h4 className={`text-xs font-semibold truncate ${isWhitish ? 'text-slate-900' : 'text-white'}`}>
+                        {wall.title}
+                      </h4>
+                      <p className={`text-[11px] truncate ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
+                        {wall.sourceCredit || wall.photographer || 'AuraDesk'}
+                      </p>
                     </div>
 
-                    <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
+                    <div className={`pt-2 border-t flex items-center justify-between text-xs ${isWhitish ? 'border-slate-100' : 'border-white/10'}`}>
                       <button
                         onClick={() => toggleWallpaperInCollection(wall.id, selectedCol.id, wall)}
-                        className="text-rose-400/80 hover:text-rose-300 text-[11px] transition-colors cursor-pointer"
+                        className="text-rose-500 hover:text-rose-600 text-[11px] transition-colors cursor-pointer"
                       >
                         Remove
                       </button>
 
                       <button
                         onClick={() => applyWallpaper(wall, 'manual')}
-                        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-[11px] font-medium border border-white/15 cursor-pointer"
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border cursor-pointer transition-all ${
+                          isWhitish
+                            ? 'bg-slate-900 hover:bg-slate-800 text-white border-transparent'
+                            : 'bg-white/10 hover:bg-white/20 text-white border-white/15'
+                        }`}
                       >
                         Apply Now
                       </button>
@@ -316,17 +352,19 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
 
       {/* Create Collection Modal */}
       {isCreatingNew && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <form
             onSubmit={handleCreate}
-            className="w-full max-w-md mac-glass-panel-dark rounded-3xl p-6 border border-white/20 shadow-2xl space-y-4 animate-in fade-in zoom-in-95"
+            className={`w-full max-w-md rounded-3xl p-6 border shadow-2xl space-y-4 ${
+              isWhitish ? 'mac-modal-light text-slate-900' : 'mac-modal-dark text-slate-100'
+            }`}
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-white">New Wallpaper Collection</h3>
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <h3 className="text-sm font-bold">New Wallpaper Collection</h3>
               <button
                 type="button"
                 onClick={() => setIsCreatingNew(false)}
-                className="text-slate-400 hover:text-white cursor-pointer"
+                className="p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 text-slate-400 hover:text-slate-200"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -334,40 +372,55 @@ export const CollectionsView: React.FC<CollectionsViewProps> = ({ onOpenAddCusto
 
             <div className="space-y-3 text-xs">
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Collection Name</label>
+                <label className={`block font-medium mb-1 ${isWhitish ? 'text-slate-700' : 'text-slate-300'}`}>
+                  Collection Name
+                </label>
                 <input
                   type="text"
                   required
                   value={newColName}
                   onChange={e => setNewColName(e.target.value)}
-                  placeholder="e.g. Cyberpunk Synthwave or Evening Relax"
-                  className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400"
+                  placeholder="e.g. Cyberpunk Synthwave, Focus Mode, Morning Calm"
+                  className={`w-full px-3 py-2 rounded-xl border outline-none ${
+                    isWhitish
+                      ? 'bg-white border-slate-300 text-slate-900 focus:border-cyan-500'
+                      : 'bg-black/40 border-white/15 text-white focus:border-cyan-400'
+                  }`}
+                  autoFocus
                 />
               </div>
 
               <div>
-                <label className="block text-slate-300 font-medium mb-1">Description</label>
+                <label className={`block font-medium mb-1 ${isWhitish ? 'text-slate-700' : 'text-slate-300'}`}>
+                  Description (optional)
+                </label>
                 <textarea
                   value={newColDesc}
                   onChange={e => setNewColDesc(e.target.value)}
                   rows={3}
                   placeholder="What kind of wallpapers fit in this collection?"
-                  className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/15 text-white placeholder-slate-400 focus:outline-none focus:border-cyan-400"
+                  className={`w-full px-3 py-2 rounded-xl border outline-none ${
+                    isWhitish
+                      ? 'bg-white border-slate-300 text-slate-900 focus:border-cyan-500'
+                      : 'bg-black/40 border-white/15 text-white focus:border-cyan-400'
+                  }`}
                 />
               </div>
             </div>
 
-            <div className="pt-2 flex items-center justify-end gap-2">
+            <div className="pt-2 flex items-center justify-end gap-2 border-t border-white/10">
               <button
                 type="button"
                 onClick={() => setIsCreatingNew(false)}
-                className="px-4 py-2 rounded-xl text-xs text-slate-300 hover:text-white cursor-pointer"
+                className={`px-3 py-2 rounded-xl text-xs font-medium transition-colors ${
+                  isWhitish ? 'hover:bg-slate-200 text-slate-700' : 'hover:bg-white/10 text-slate-300'
+                }`}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 rounded-xl bg-cyan-500/30 hover:bg-cyan-500/40 text-cyan-100 border border-cyan-400/30 font-medium text-xs shadow-md cursor-pointer"
+                className="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white font-semibold text-xs shadow-md transition-colors"
               >
                 Create Collection
               </button>

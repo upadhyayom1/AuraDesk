@@ -16,11 +16,14 @@ import {
   ShieldCheck,
   Sun,
   Moon,
+  RotateCw,
 } from 'lucide-react';
 
 export type ActiveTab =
   | 'discovery'
   | 'collections'
+  | 'rotation'
+  | 'personalization'
   | 'history';
 
 interface MacSidebarProps {
@@ -28,7 +31,6 @@ interface MacSidebarProps {
   onSelectTab: (tab: ActiveTab) => void;
   onOpenNewWallpaperModal: () => void;
   onOpenSettings: () => void;
-  onOpenTeam: () => void;
 }
 
 export const MacSidebar: React.FC<MacSidebarProps> = ({
@@ -36,7 +38,6 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
   onSelectTab,
   onOpenNewWallpaperModal,
   onOpenSettings,
-  onOpenTeam,
 }) => {
   const {
     collections,
@@ -58,6 +59,8 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
   const mainNavItems: Array<{ id: ActiveTab; label: string; icon: any; count?: number; highlight?: boolean }> = [
     { id: 'discovery' as ActiveTab, label: 'Explore Wallpapers', icon: Compass, count: wallpapers.length },
     { id: 'collections' as ActiveTab, label: 'Collections', icon: FolderHeart, count: collections.length },
+    { id: 'rotation' as ActiveTab, label: 'Wallpaper Rotation', icon: RotateCw },
+    { id: 'personalization' as ActiveTab, label: 'Personalization', icon: Sparkles },
     { id: 'history' as ActiveTab, label: 'Rotation History', icon: History },
   ];
 
@@ -139,12 +142,12 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
             </button>
           </div>
 
-          {/* Right side tools: Quick Theme Switcher & Team Info */}
+          {/* Right side tools: Quick Theme Switcher */}
           <div className="flex items-center gap-1.5 app-no-drag">
             <button
               type="button"
               onClick={() => setGlassTheme(isWhitish ? 'blackish' : 'whitish')}
-              className={`p-1 rounded-full border transition-all ${
+              className={`p-1.5 rounded-full border transition-all ${
                 isWhitish
                   ? 'bg-black/5 hover:bg-black/10 border-black/10 text-slate-700'
                   : 'bg-white/10 hover:bg-white/15 border-white/15 text-slate-200'
@@ -153,22 +156,10 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
               aria-label="Toggle Theme"
             >
               {isWhitish ? (
-                <Moon className="w-3 h-3 text-indigo-600" />
+                <Moon className="w-3.5 h-3.5 text-indigo-600" />
               ) : (
-                <Sun className="w-3 h-3 text-amber-400 fill-amber-400/20" />
+                <Sun className="w-3.5 h-3.5 text-amber-400 fill-amber-400/20" />
               )}
-            </button>
-
-            <button
-              onClick={onOpenTeam}
-              className={`flex items-center px-2 py-0.5 rounded-md border text-[10px] font-mono transition-colors ${
-                isWhitish
-                  ? 'bg-black/5 hover:bg-black/10 border-black/10 text-slate-700'
-                  : 'bg-white/5 hover:bg-white/10 border-white/10 text-slate-300'
-              }`}
-              title="Softablitz 2026 Team 220"
-            >
-              <span>Team 220</span>
             </button>
           </div>
         </div>
@@ -184,7 +175,7 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
             </h1>
           </div>
           <p className={`text-[11px] mt-0.5 ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
-            Intelligent Wallpaper Engine
+            Intelligent Wallpaper Personalization
           </p>
         </div>
 
@@ -292,7 +283,7 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
         </div>
       </div>
 
-      {/* Bottom Mini Active Widget & Softablitz 2026 Credit */}
+      {/* Bottom Mini Active Widget */}
       <div className={`pt-3 border-t space-y-2.5 ${isWhitish ? 'border-black/10' : 'border-white/10'}`}>
         {/* Active Wallpaper Micro Thumbnail */}
         <div
@@ -317,20 +308,19 @@ export const MacSidebar: React.FC<MacSidebarProps> = ({
           </div>
         </div>
 
-        {/* Footer info button */}
+        {/* Footer info & settings button */}
         <div className={`flex items-center justify-between text-[11px] px-1 ${isWhitish ? 'text-slate-500' : 'text-slate-400'}`}>
-          <button
-            onClick={onOpenTeam}
-            className={`transition-colors flex items-center gap-1 ${isWhitish ? 'hover:text-slate-900' : 'hover:text-white'}`}
-          >
-            <span>Softablitz 2026</span>
-          </button>
+          <div className="flex items-center gap-1.5 font-mono text-[10px] opacity-75">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>macOS Ready</span>
+          </div>
           <button
             onClick={onOpenSettings}
             className={`p-1 rounded-md transition-colors ${
               isWhitish ? 'hover:bg-black/5 hover:text-slate-900' : 'hover:bg-white/10 hover:text-white'
             }`}
-            title="Settings"
+            title="Application Settings"
+            aria-label="Settings"
           >
             <Sliders className="w-3.5 h-3.5" />
           </button>

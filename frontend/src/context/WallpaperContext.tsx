@@ -78,8 +78,8 @@ const DEFAULT_SETTINGS: AppSettings = {
   scalingMode: 'fill',
   avoidRecentWallpapers: true,
   recentHistoryLimit: 10,
-  glassTheme: 'whitish',
-  darkMode: false,
+  glassTheme: 'blackish',
+  darkMode: true,
   systemTrayMinimized: false,
 };
 
@@ -104,7 +104,7 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [scalingMode, setScalingModeState] = useState<ScalingMode>('fill');
-  const [glassTheme, setGlassThemeState] = useState<'whitish' | 'blackish'>('whitish');
+  const [glassTheme, setGlassThemeState] = useState<'whitish' | 'blackish'>('blackish');
   const [schedulerRunning, setSchedulerRunning] = useState<boolean>(true);
   const [secondsRemaining, setSecondsRemaining] = useState<number>(15 * 60);
   const [isTrayOpen, setIsTrayOpen] = useState<boolean>(false);
@@ -248,9 +248,13 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         // 5. Settings from SQLite
         const savedSettings = await electronBridge.getSettings();
         if (isMounted && savedSettings) {
+          const loadedTheme = (savedSettings.glassTheme as 'whitish' | 'blackish') || (savedSettings.darkMode ? 'blackish' : 'whitish') || 'blackish';
+          setGlassThemeState(loadedTheme);
           setSettings(prev => ({
             ...prev,
             ...savedSettings,
+            glassTheme: loadedTheme,
+            darkMode: loadedTheme === 'blackish',
             rotationIntervalMinutes: savedSettings.rotationInterval ?? prev.rotationIntervalMinutes,
             shuffleEnabled: savedSettings.shuffleEnabled ?? prev.shuffleEnabled,
             autoAdaptEnabled: savedSettings.autoAdaptEnabled ?? prev.autoAdaptEnabled,
@@ -519,7 +523,7 @@ export const WallpaperProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const setGlassTheme = useCallback((theme: 'whitish' | 'blackish') => {
     setGlassThemeState(theme);
-    updateSettings({ glassTheme: theme });
+    updateSettings({ glassTheme: theme, darkMode: theme === 'blackish' });
   }, [updateSettings]);
 
   const setScalingMode = useCallback((mode: ScalingMode) => {

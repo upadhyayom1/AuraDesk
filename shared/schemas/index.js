@@ -63,7 +63,9 @@ const AppSettingsSchema = z.object({
   sourcesEnabled: z.object({
     unsplash: z.boolean().default(true),
     pexels: z.boolean().default(true)
-  }).default({ unsplash: true, pexels: true })
+  }).default({ unsplash: true, pexels: true }),
+  glassTheme: z.enum(['whitish', 'blackish']).optional().default('blackish'),
+  darkMode: z.boolean().optional().default(true)
 });
 
 const AppSettingsPatchSchema = AppSettingsSchema.partial();
