@@ -356,8 +356,6 @@ git clone <YOUR_REPOSITORY_URL>
 cd AuraDesk
 ```
 
-If your cloned directory is named `AuraDesk-main`, change into that directory instead.
-
 ### 2. Install dependencies
 
 Run these commands from the repository root:
